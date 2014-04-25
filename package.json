@@ -1,0 +1,46 @@
+{
+  "name": "grunt-debian-package",
+  "description": "Create debian package from grunt build",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jamesdbloom/grunt-debian-package",
+  "author": {
+    "name": "James Bloom",
+    "email": "jamesdbloom@gmail.com",
+    "url": "http://blog.jamesdbloom.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamesdbloom/grunt-debian-package.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jamesdbloom/grunt-debian-package/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jamesdbloom/grunt-debian-package/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "archiver": "^0.9.0",
+    "dateformat": "^1.0.7-1.2.3",
+    "grunt": "~0.4.4",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "node-spawn": "0.0.7",
+    "replace": "^0.2.9"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}

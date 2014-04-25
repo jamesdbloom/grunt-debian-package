@@ -1,0 +1,11 @@
+Source: ${name}
+Maintainer: James Bloom <james.bloom@nektan.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: ${name}
+Architecture: any
+Description: ${short_description}
+ ${long_description}
