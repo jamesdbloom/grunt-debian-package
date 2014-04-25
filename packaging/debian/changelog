@@ -2,4 +2,4 @@ ${name} (2.0-1) UNRELEASED; urgency=low
 
   * Initial release. (Closes: #XXXXXX)
 
- -- James Bloom <james.bloom@nektan.com>  Fri, 25th April 2014, 3:06:02 +0000
+ -- James Bloom <james.bloom@nektan.com>  ${date}
