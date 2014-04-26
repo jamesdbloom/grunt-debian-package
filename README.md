@@ -26,6 +26,10 @@ In your project's Gruntfile, add a section named `debian_package` to the data ob
 grunt.initConfig({
   debian_package: {
     options: {
+        maintainer: {
+            name: "James D Bloom",
+            email: "jamesdbloom@email.com"
+        },
         name: "package_name",
         short_description: "the short description",
         long_description: "the long description added to the debian package",
@@ -57,6 +61,18 @@ This will result in a package being created called **package_name-2.0.0_001.deb*
 TODO ADD SECTION ON SHORT AND LONG DESCRIPTION AND DPKG COMMANDS
 
 ### Options
+
+#### options.maintainer.name
+Type: `String`
+Default value: `process.env.DEBFULLNAME`
+
+This value specifies the maintainer's name for the debian package.  The default value is taken from the standard debian environment variable `DEBFULLNAME`.
+
+#### options.maintainer.email
+Type: `String`
+Default value: `process.env.DEBEMAIL`
+
+This value specifies the maintainer's email for the debian package.  The default value is taken from the standard debian environment variable `DEBEMAIL`.
 
 #### options.name
 Type: `String`
@@ -120,6 +136,10 @@ Not providing any options will result in the following default values:
 var properties = require(process.cwd() + '/package.json');
 
 options: {
+  maintainer: {
+      name: process.env.DEBFULLNAME,
+      email: process.env.DEBEMAIL
+  },
   name: properties.name,
   short_description: properties.description && properties.description.split(/\r\n|\r|\n/g)[0],
   long_description: properties.description && properties.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
@@ -128,7 +148,7 @@ options: {
 }
 ```
 
-**name**, **short_description**, **long_description** and **version** are all read from the *package.json*.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is taken from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
+**maintainer** is taken from the standard debian environment variables `DEBFULLNAME` and `DEBEMAIL`.  **name**, **short_description**, **long_description** and **version** are all read from the *package.json*.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is taken from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
 
 #### Custom Options
 
@@ -138,6 +158,10 @@ In this example, custom options are used to override the default values.  A file
 grunt.initConfig({
   debian_package: {
     options: {
+        maintainer: {
+            name: "James D Bloom",
+            email: "jamesdbloom@email.com"
+        },
         name: "package_name",
         short_description: "the short description",
         long_description: "the long description added to the debian package",
@@ -162,7 +186,6 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 _(Nothing yet)_
 
 ## Future Plans
-1. Configurable maintaner name & email
-2. Custom copyright file
-3. Custom changelist (optionally based on git)
-4. Soft link support
+1. Custom copyright file
+2. Custom changelist (optionally based on git)
+3. Soft link support
