@@ -22,17 +22,15 @@ grunt.loadNpmTasks('grunt-debian-package');
 ### Overview
 In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`. 
 
-The following example configuration shows the default values provided for the options, with an example files section.
-
 ```js
 grunt.initConfig({
   debian_package: {
     options: {
-        name: grunt.package.name,
-        short_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0],
-        long_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
-        version: grunt.package.version,
-        build_number: process.env.BUILD_NUMBER
+        name: "package name",
+        short_description: "the short description",
+        long_description: "the long description added to the debian package",
+        version: "2.0.0",
+        build_number: "001"
     },
     files: [
         {
@@ -95,12 +93,12 @@ This task supports all the file mapping format Grunt supports. Please read [Glob
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+
+The following example configuration shows the default values for the options.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.
 
 ```js
 grunt.initConfig({
   debian_package: {
-    options: {},
     files: {
         src: [
             'dist/**',
@@ -112,18 +110,31 @@ grunt.initConfig({
 });
 ```
 
+Not providing any options will result in the following default values:
+
+```js
+  options: {
+      name: grunt.package.name,
+      short_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0],
+      long_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
+      version: grunt.package.version,
+      build_number: process.env.BUILD_NUMBER
+  }
+```
+
 #### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+
+In this example, custom options are used to override the default values.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.
 
 ```js
 grunt.initConfig({
   debian_package: {
     options: {
-      name: "package name",
-      short_description: "the short description",
-      long_description: "the long description added to the debian package",
-      version: "2.0.0",
-      build_number: "123"
+        name: "package name",
+        short_description: "the short description",
+        long_description: "the long description added to the debian package",
+        version: "2.0.0",
+        build_number: "001"
     },
     files: {
         src: [
