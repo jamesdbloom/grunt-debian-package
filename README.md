@@ -60,25 +60,25 @@ TODO ADD SECTION ON SHORT AND LONG DESCRIPTION AND DPKG COMMANDS
 
 #### options.name
 Type: `String`
-Default value: `grunt.package.name`
+Default value: **package.json** `name`
 
 This value specifies the name of the debian package.  The default value is taken from the package.json name value.
 
 #### options.short_description
 Type: `String`
-Default value: `grunt.package.description.split(/\r\n|\r|\n/g)[0]`
+Default value: **package.json** `description` first line only
 
 This value specifies the short description for the debian package, for example, this is displayed when listing all packages using the `dpkg -l` command.  The default value is taken from the first line of the package.json description value.
 
 #### options.long_description
 Type: `String`
-Default value: `grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' ')`
+Default value: **package.json** `description` all except first line
 
 This value specifies the multiple line long description for the debian package, for example, this is displayed when quering package status using the `dpkg -s <package.name>` command.  The default value is taken from all text **after the end of the first line** of the package.json description value.
 
 #### options.version
 Type: `String`
-Default value: `grunt.package.version`
+Default value: **package.json** `version`
 
 The first part of the version number.  This version number is intended to respresent the logical version of the code in the package.  The default value is taken from the package.json version value.
 
@@ -117,13 +117,15 @@ grunt.initConfig({
 Not providing any options will result in the following default values:
 
 ```js
-  options: {
-      name: grunt.package.name,
-      short_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0],
-      long_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
-      version: grunt.package.version,
-      build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER
-  }
+var properties = require(process.cwd() + '/package.json');
+
+options: {
+  name: properties.name,
+  short_description: properties.description && properties.description.split(/\r\n|\r|\n/g)[0],
+  long_description: properties.description && properties.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
+  version: properties.version,
+  build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER
+}
 ```
 
 **name**, **short_description**, **long_description** and **version** are all read from the *package.json*.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is taken from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
