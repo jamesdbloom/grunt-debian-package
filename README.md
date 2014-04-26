@@ -136,7 +136,7 @@ Not providing any options will result in the following default values:
 var properties = require(process.cwd() + '/package.json');
 
 options: {
-  maintainer: {
+  maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
       name: process.env.DEBFULLNAME,
       email: process.env.DEBEMAIL
   },
