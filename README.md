@@ -26,7 +26,7 @@ In your project's Gruntfile, add a section named `debian_package` to the data ob
 grunt.initConfig({
   debian_package: {
     options: {
-        name: "package name",
+        name: "package_name",
         short_description: "the short description",
         long_description: "the long description added to the debian package",
         version: "2.0.0",
@@ -52,35 +52,39 @@ grunt.initConfig({
 });
 ```
 
+This will result in a package being created called **package_name-2.0.0_001.deb**.
+
+TODO ADD SECTION ON SHORT AND LONG DESCRIPTION AND DPKG COMMANDS
+
 ### Options
 
 #### options.name
 Type: `String`
-Default value: `'grunt.package.name'`
+Default value: `grunt.package.name`
 
 This value specifies the name of the debian package.  The default value is taken from the package.json name value.
 
 #### options.short_description
 Type: `String`
-Default value: `'grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0]'`
+Default value: `grunt.package.description.split(/\r\n|\r|\n/g)[0]`
 
 This value specifies the short description for the debian package, for example, this is displayed when listing all packages using the `dpkg -l` command.  The default value is taken from the first line of the package.json description value.
 
 #### options.long_description
 Type: `String`
-Default value: `'grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' ')'`
+Default value: `grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' ')`
 
 This value specifies the multiple line long description for the debian package, for example, this is displayed when quering package status using the `dpkg -s <package.name>` command.  The default value is taken from all text **after the end of the first line** of the package.json description value.
 
 #### options.version
 Type: `String`
-Default value: `'grunt.package.version'`
+Default value: `grunt.package.version`
 
 The first part of the version number.  This version number is intended to respresent the logical version of the code in the package.  The default value is taken from the package.json version value.
 
 #### options.build_number
 Type: `String`
-Default value: `'process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER'`
+Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER`
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
 
@@ -122,17 +126,17 @@ Not providing any options will result in the following default values:
   }
 ```
 
-**name**, **short_description**, **long_description** and **version** are all read from the package.json.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is take from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
+**name**, **short_description**, **long_description** and **version** are all read from the *package.json*.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is taken from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
 
 #### Custom Options
 
-In this example, custom options are used to override the default values.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.
+In this example, custom options are used to override the default values.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.  The package created will be called **package_name-2.0.0_001.deb**.
 
 ```js
 grunt.initConfig({
   debian_package: {
     options: {
-        name: "package name",
+        name: "package_name",
         short_description: "the short description",
         long_description: "the long description added to the debian package",
         version: "2.0.0",
@@ -154,3 +158,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 _(Nothing yet)_
+
+## Future Plans
+1. Custom maintaner name & email
+2. Custom copyright file
+3. Custom changelist
+4. Soft link support
