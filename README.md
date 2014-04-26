@@ -160,7 +160,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 _(Nothing yet)_
 
 ## Future Plans
-1. Custom maintaner name & email
+1. Configurable maintaner name & email
 2. Custom copyright file
-3. Custom changelist
+3. Custom changelist (optionally based on git)
 4. Soft link support
