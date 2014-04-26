@@ -11,6 +11,13 @@ If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out th
 npm install grunt-debian-package --save-dev
 ```
 
+You will also need to install two debian tools used to create and lint the debian package, as follows:
+
+```shell
+sudo apt-get install devscripts
+sudo apt-get install debhelper
+```
+
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
 ```js
