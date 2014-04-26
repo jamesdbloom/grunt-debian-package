@@ -118,9 +118,11 @@ Not providing any options will result in the following default values:
       short_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0],
       long_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
       version: grunt.package.version,
-      build_number: process.env.BUILD_NUMBER
+      build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER
   }
 ```
+
+**name**, **short_description**, **long_description** and **version** are all read from the package.json.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is take from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
 
 #### Custom Options
 
