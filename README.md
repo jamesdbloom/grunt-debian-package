@@ -20,22 +20,37 @@ grunt.loadNpmTasks('grunt-debian-package');
 ## The "debian_package" task
 
 ### Overview
-In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`. 
+
+The following example configuration shows the default values provided for the options, with an example files section.
 
 ```js
 grunt.initConfig({
   debian_package: {
     options: {
-      name: "package name"
-      short_description: "the short description"
-      long_description: "the long description added to the debian package"
-      version: "2.0.0"
-      build_number: "123"
+        name: grunt.package.name,
+        short_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0],
+        long_description: grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
+        version: grunt.package.version,
+        build_number: process.env.BUILD_NUMBER
     },
-    files: {
-      src: 'dist/**'
-    },
-  },
+    files: [
+        {
+            expand: true,       // Enable dynamic expansion.
+            cwd: 'build/',      // Src matches are relative to this path.
+            src: [              // Actual pattern(s) to match.
+                '**/*.js',
+                '**/*.html',
+                '**/*.css'
+            ],
+            dest: '/var/www/'   // Destination path prefix.
+        },
+        {                       // Use template in file path
+            src:  'config/<%= grunt.package.name %>.json', 
+            dest: '/var/www/<%= grunt.package.name %>.json'
+        }
+    ]
+  }
 });
 ```
 
@@ -43,33 +58,33 @@ grunt.initConfig({
 
 #### options.name
 Type: `String`
-Default value: `'debian_package'`
+Default value: `'grunt.package.name'`
 
-This value specifies the name of the debian package.
+This value specifies the name of the debian package.  The default value is taken from the package.json name value.
 
 #### options.short_description
 Type: `String`
-Default value: `'short description'`
+Default value: `'grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g)[0]'`
 
-This value specifies the short description for the debian package, for example, this is displayed when listing all packages using the `dpkg -l` command. 
+This value specifies the short description for the debian package, for example, this is displayed when listing all packages using the `dpkg -l` command.  The default value is taken from the first line of the package.json description value.
 
 #### options.long_description
 Type: `String`
-Default value: `'the long package description'`
+Default value: `'grunt.package.description && grunt.package.description.split(/\r\n|\r|\n/g).splice(1).join(' ')'`
 
-This value specifies the multiple line long description for the debian package, for example, this is displayed when quering package status using the `dpkg -s <package.name>` command. 
+This value specifies the multiple line long description for the debian package, for example, this is displayed when quering package status using the `dpkg -s <package.name>` command.  The default value is taken from all text **after the end of the first line** of the package.json description value.
 
 #### options.version
 Type: `String`
-Default value: `'0.0.1'`
+Default value: `'grunt.package.version'`
 
-The first part of the version number.  This version number is intended to respresent the logical version of the code in the package.
+The first part of the version number.  This version number is intended to respresent the logical version of the code in the package.  The default value is taken from the package.json version value.
 
 #### options.build_number
 Type: `String`
-Default value: `'000'`
+Default value: `'process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER'`
 
-The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.
+The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
 
 ### Files
 
@@ -87,8 +102,12 @@ grunt.initConfig({
   debian_package: {
     options: {},
     files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+        src: [
+            'dist/**',
+            '!dist'
+        ]
+        dest: '/var/www/'
+    }
   },
 });
 ```
@@ -100,12 +119,19 @@ In this example, custom options are used to do something else with whatever else
 grunt.initConfig({
   debian_package: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
+      name: "package name",
+      short_description: "the short description",
+      long_description: "the long description added to the debian package",
+      version: "2.0.0",
+      build_number: "123"
     },
     files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+        src: [
+            'dist/**',
+            '!dist'
+        ]
+        dest: '/var/www/'
+    }
   },
 });
 ```
