@@ -1,5 +1,5 @@
 Source: ${name}
-Maintainer: James Bloom <james.bloom@nektan.com>
+Maintainer: ${maintainer.name} <${maintainer.email}>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2

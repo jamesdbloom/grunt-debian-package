@@ -1,5 +1,5 @@
-${name} (2.0-1) UNRELEASED; urgency=low
+${name} (${version}-${build_number}) UNRELEASED; urgency=low
 
   * Initial release. (Closes: #XXXXXX)
 
- -- James Bloom <james.bloom@nektan.com>  ${date}
+ -- ${maintainer.name} <${maintainer.email}>  ${date}
