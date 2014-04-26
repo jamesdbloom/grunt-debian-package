@@ -156,7 +156,7 @@ module.exports = function (grunt) {
             });
             process.chdir('..');
 
-            require('sleep').sleep(3);
+            require('sleep').sleep(10);
 
             var debuildErrorLog = fs.readFileSync(options.name + '_' + options.version + '-' + options.build_number + '_i386.build', 'utf8');
             if(debuildErrorLog) {
