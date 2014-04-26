@@ -71,9 +71,9 @@ Default value: `'000'`
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.
 
-#### files
+### Files
 
-The files to add into the package.  
+The files configuration specifies the files to add into the package.
 
 This task supports all the file mapping format Grunt supports. Please read [Globbing patterns](http://gruntjs.com/configuring-tasks#globbing-patterns) and [Building the files object dynamically](http://gruntjs.com/configuring-tasks#building-the-files-object-dynamically) for additional details.
 
