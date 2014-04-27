@@ -10,10 +10,88 @@
 
 module.exports = function (grunt) {
 
-    var fs = require('fs'),
-        path = require('path'),
-        replace = require("replace"),
-        packagingDir = 'packaging';
+    String.prototype.replaceAll = function (find, replace) {
+        var str = this;
+        return str.replace(new RegExp(find, 'g'), replace);
+    };
+
+    var baseDirectory = 'packaging',
+        hasValidOptions = function (options) {
+            var valid = true;
+            if (!options.maintainer.name) {
+                grunt.log.subhead('no maintainer name provided!!');
+                grunt.log.errorlns('please add the \'maintainer.name\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBFULLNAME\' environment variable (i.e. export DEBFULLNAME="James D Bloom")');
+                valid = false;
+            }
+            if (!options.maintainer.email) {
+                grunt.log.subhead('no maintainer email provided!!');
+                grunt.log.errorlns('please add the \'maintainer.email\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBEMAIL\' environment variable (i.e. export DEBEMAIL="jamesdbloom@email.com")');
+                valid = false;
+            }
+            if (!options.short_description) {
+                grunt.log.subhead('no short description provided!!');
+                grunt.log.errorlns('please add the \'short_description\' option in your debian_package configuration in your Gruntfile.js or add a \'description\' field to package.json');
+                valid = false;
+            }
+            if (!options.short_description) {
+                grunt.log.subhead('no long description provided!!');
+                grunt.log.errorlns('please add the \'long_description\' option in your debian_package configuration in your Gruntfile.js or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)');
+                valid = false;
+            }
+            return valid;
+        },
+        deleteFileOrDirectory = function (path) {
+            grunt.verbose.writeln('Deleting: \'' + path + '\'');
+            grunt.file.delete(grunt.file.expand(path), {force: true});
+        },
+        copyFileOrDirectory = function (source, destination) {
+            grunt.file.expand(source).forEach(function (file) {
+                if (grunt.file.isDir(file)) {
+                    grunt.file.recurse(file, function callback(abspath, rootdir, subdir, filename) {
+                        grunt.verbose.writeln('Copying: \'' + abspath + '\' to \'' + destination + '/' + (subdir ? subdir + '/' : '') + filename + '\'');
+                        grunt.file.copy(abspath, destination + '/' + (subdir ? subdir + '/' : '') + filename);
+                    });
+                } else {
+                    grunt.file.copy(file, destination);
+                }
+            });
+        },
+        findAndReplace = function (files, find, replace) {
+            grunt.verbose.writeln('Replacing: \'' + replace.replaceAll('\\n', '\\n').replaceAll('\\t', '\\t') + '\' for \'' + find.replaceAll('\\\\', '') + '\' in ' + files.join(' and '));
+            require('replace')({
+                regex: find,
+                replacement: replace,
+                paths: files,
+                recursive: true,
+                silent: true
+            });
+        },
+        transformAndReplace = function (files, find, list, transform) {
+            if (list) {
+                var replace = '';
+
+                for (var i = 0; i < list.length; i++) {
+                    replace += transform(list[i])
+                }
+
+                findAndReplace(files, find, replace);
+            }
+        },
+        preparePackageContents = function (files) {
+            transformAndReplace([baseDirectory + '/Makefile'], '\\$\\{file_list\\}', files, function (file) {
+                return file.src.filter(function (filepath) {
+                    if (!grunt.file.exists(filepath)) {
+                        grunt.log.warn('File \'' + filepath + '\' not found');
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }).map(function (filepath) {
+                    grunt.log.writeln('Adding \'' + filepath + '\' to \'' + file.dest + '\'');
+                    return '\tmkdir -p $(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + ' && cp -a ' + process.cwd() + '/' + filepath + ' $(DESTDIR)' + file.dest + '\n';
+                }).join('');
+            });
+        };
 
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
             // tell Grunt this task is asynchronous.
@@ -34,213 +112,67 @@ module.exports = function (grunt) {
                 }),
                 spawn = require('child_process').spawn,
                 dateFormat = require('dateformat'),
-                now = dateFormat(new Date(), "ddd, d mmm yyyy h:MM:ss +0000"),
-                changelog = packagingDir + '/debian/changelog',
-                control = packagingDir + '/debian/control',
-                links = packagingDir + '/debian/links',
-                dirs = packagingDir + '/debian/dirs';
+                now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
+                changelog = baseDirectory + '/debian/changelog',
+                control = baseDirectory + '/debian/control',
+                links = baseDirectory + '/debian/links',
+                dirs = baseDirectory + '/debian/dirs';
+
+            if (!hasValidOptions(options)) {
+                done(false);
+            }
 
             // set environment variables if they are not already set
             process.env.DEBFULLNAME = options.maintainer.name;
             process.env.DEBEMAIL = options.maintainer.email;
 
-            deleteFolderRecursive(packagingDir);
-            recursiveCopy(__dirname + '/../' + packagingDir, packagingDir);
+            deleteFileOrDirectory(baseDirectory);
+            deleteFileOrDirectory(options.name + '*.dsc');
+            deleteFileOrDirectory(options.name + '*.tar.gz');
+            deleteFileOrDirectory(options.name + '*.build');
+            deleteFileOrDirectory(options.name + '*.changes');
+            deleteFileOrDirectory(options.name + '*.deb');
+            copyFileOrDirectory(__dirname + '/../' + baseDirectory, baseDirectory);
 
-
-            if (options.links) {
-                var softlinks = "";
-                for (var i = 0; i < options.links.length; i++) {
-                    softlinks += options.links[i].source + '       ' + options.links[i].target + '\n';
-                }
-                fs.writeFileSync(links, softlinks);
-            }
-            if (options.directories) {
-                var directories = "";
-                for (var i = 0; i < options.directories.length; i++) {
-                    directories += options.directories[i] + '\n';
-                }
-                fs.writeFileSync(dirs, directories);
-            }
-
-            replace({
-                regex: "\\$\\{maintainer.name\\}",
-                replacement: options.maintainer.name,
-                paths: [changelog, control],
-                recursive: true,
-                silent: true
+            transformAndReplace([links], '\\$\\{softlinks\\}', options.links, function (softlink) {
+                return softlink.source + '       ' + softlink.target + '\n';
             });
-            if (!options.maintainer.name) {
-                grunt.log.subhead('no maintainer name provided!!');
-                grunt.log.errorlns('please add the \'maintainer.name\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBFULLNAME\' environment variable (i.e. export DEBFULLNAME="James D Bloom")');
-            } else {
-                grunt.verbose.writeln('Replaced \'' + options.maintainer.name + '\' for ${maintainer.name} in ' + changelog + ' and ' + control);
-            }
-
-            replace({
-                regex: "\\$\\{maintainer.email\\}",
-                replacement: options.maintainer.email,
-                paths: [changelog, control],
-                recursive: true,
-                silent: true
+            transformAndReplace([dirs], '\\$\\{directories\\}', options.directories, function (directory) {
+                return directory + '\n';
             });
-            if (!options.maintainer.email) {
-                grunt.log.subhead('no maintainer email provided!!');
-                grunt.log.errorlns('please add the \'maintainer.email\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBEMAIL\' environment variable (i.e. export DEBEMAIL="jamesdbloom@email.com")');
-            } else {
-                grunt.verbose.writeln('Replaced \'' + options.maintainer.email + '\' for ${maintainer.email} in ' + changelog + ' and ' + control);
-            }
 
-            replace({
-                regex: "\\$\\{date\\}",
-                replacement: now,
-                paths: [changelog],
-                recursive: true,
-                silent: true
-            });
-            grunt.verbose.writeln('Replaced \'' + now + '\' for ${date} in ' + changelog);
-
-            replace({
-                regex: "\\$\\{name\\}",
-                replacement: options.name,
-                paths: [changelog, control, links, dirs],
-                recursive: true,
-                silent: true
-            });
-            grunt.verbose.writeln('Replaced \'' + options.name + '\' for ${name} in ' + changelog + ' and ' + control + ' and ' + links + ' and ' + dirs);
-
-            replace({
-                regex: "\\$\\{short_description\\}",
-                replacement: options.short_description,
-                paths: [control],
-                recursive: true,
-                silent: true
-            });
-            if (!options.short_description) {
-                grunt.log.subhead('no short description provided!!');
-                grunt.log.errorlns('please add the \'short_description\' option in your debian_package configuration in your Gruntfile.js or add a \'description\' field to package.json');
-            } else {
-                grunt.verbose.writeln('Replaced \'' + options.short_description + '\' for ${short_description} in ' + control);
-            }
-
-            replace({
-                regex: "\\$\\{long_description\\}",
-                replacement: options.long_description,
-                paths: [control],
-                recursive: true,
-                silent: true
-            });
-            if (!options.short_description) {
-                grunt.log.subhead('no long description provided!!');
-                grunt.log.errorlns('please add the \'long_description\' option in your debian_package configuration in your Gruntfile.js or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)');
-            } else {
-                grunt.verbose.writeln('Replaced \'' + options.long_description + '\' for ${long_description} in ' + control);
-            }
-
-            replace({
-                regex: "\\$\\{version\\}",
-                replacement: options.version,
-                paths: [changelog],
-                recursive: true,
-                silent: true
-            });
-            grunt.verbose.writeln('Replaced \'' + options.version + '\' for ${version} in ' + changelog);
-
-            replace({
-                regex: "\\$\\{build_number\\}",
-                replacement: options.build_number,
-                paths: [changelog],
-                recursive: true,
-                silent: true
-            });
-            grunt.verbose.writeln('Replaced \'' + options.build_number + '\' for ${build_number} in ' + changelog);
+            findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
+            findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
+            findAndReplace([changelog], '\\$\\{date\\}', now);
+            findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', options.name);
+            findAndReplace([control], '\\$\\{short_description\\}', options.short_description);
+            findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
+            findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
+            findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
 
             preparePackageContents(this.files);
 
-            grunt.log.writeln("About to run debuild...");
-            if (fs.existsSync('/usr/bin/debuild')) {
+            grunt.verbose.writeln('Running debuild...');
+            if (grunt.file.exists('/usr/bin/debuild')) {
                 var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'dir-or-file-in-var-www'], {
-                    cwd: packagingDir,
-                    stdio: [ 'ignore', process.stdout, process.stderr ]
+                    cwd: baseDirectory,
+                    stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
                 });
                 debuild.on('exit', function (code) {
                     if (code !== 0) {
                         grunt.log.subhead('error running debuild!!');
                         done(false);
                     } else {
-                        grunt.log.writeln("Successfully ran debuild...");
+                        grunt.log.writeln('Created package: ' + grunt.file.expand(options.name + '*.deb'));
                         done(true);
                     }
                 });
-
             } else {
                 grunt.log.subhead('\'debuild\' executable not found!!');
                 grunt.log.warn('to install debuild try running \'sudo apt-get install devscripts\'');
-                return false;
+                done(false);
             }
         }
     );
-
-    var deleteFolderRecursive = function (path) {
-        var files = [];
-        if (fs.existsSync(path)) {
-            files = fs.readdirSync(path);
-            files.forEach(function (file, index) {
-                var curPath = path + "/" + file;
-                if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                    deleteFolderRecursive(curPath);
-                } else { // delete file
-                    fs.unlinkSync(curPath);
-                }
-            });
-            fs.rmdirSync(path);
-        }
-    };
-
-    var recursiveCopy = function (src, dest) {
-        var exists = fs.existsSync(src),
-            stats = exists && fs.statSync(src),
-            isDirectory = exists && stats.isDirectory();
-
-        if (exists && isDirectory) {
-            fs.mkdirSync(dest);
-            fs.readdirSync(src).forEach(function (childItemName) {
-                recursiveCopy(path.join(src, childItemName), path.join(dest, childItemName));
-            });
-        } else {
-            require('child_process').spawn('cp', [src, dest]);
-            // for an unkown reason fs.linkSync causes an EPERM error (only on vagrant) so resorting to using cp as a work around
-            // fs.linkSync(src, dest);
-        }
-    };
-
-    var preparePackageContents = function (files) {
-        var makeFileList = "";
-
-        // iterate over all specified file groups
-        files.forEach(function (f) {
-            // concat specified files
-            var src = f.src.filter(function (filepath) {
-                // warn on and remove invalid source files
-                if (!grunt.file.exists(filepath)) {
-                    grunt.log.warn('Source file "' + filepath + '" not found.');
-                    return false;
-                } else {
-                    grunt.log.writeln("Adding \'" + filepath + "\' to package");
-                    makeFileList += '\tmkdir -p $(DESTDIR)' + f.dest.substr(0, f.dest.lastIndexOf('/')) + '\n';
-                    makeFileList += '\tcp -a ' + process.cwd() + '/' + filepath + ' $(DESTDIR)' + f.dest + '\n';
-                    return true;
-                }
-            });
-        });
-
-        replace({
-            regex: "\\$\\{file_list\\}",
-            replacement: makeFileList,
-            paths: [packagingDir + '/Makefile'],
-            recursive: true,
-            silent: true
-        });
-    };
 
 };

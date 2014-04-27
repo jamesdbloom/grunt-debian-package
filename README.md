@@ -24,6 +24,29 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-debian-package');
 ```
 
+To print out verbose messages during packaging use --verbose, for example:
+
+```shell
+grunt debian_package --verbose
+```
+
+To debug any issues with the debian_package task configuration:
+
+1. use the node-inspector:
+
+```shell
+sudo npm install -g node-inspector
+node --debug-brk $(which grunt) debian_package --verbose
+```
+
+2. in another shell process:
+
+```shell
+node-inspector
+```
+
+3. open the url displayed in a browser
+
 ## The "debian_package" task
 
 ### Overview
@@ -218,5 +241,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 _(Nothing yet)_
 
 ## Future Plans
-1. Custom copyright file
-2. Custom changelist (optionally based on git)
+1. Add options to support custom copyright file
+2. Add options to support generation of changelist from git log
