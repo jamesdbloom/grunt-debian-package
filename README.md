@@ -243,3 +243,5 @@ _(Nothing yet)_
 ## Future Plans
 1. Add options to support custom copyright file
 2. Add options to support generation of changelist from git log
+
+[James D Bloom](http://blog.jamesdbloom.com)
