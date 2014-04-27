@@ -32,20 +32,20 @@ grunt debian_package --verbose
 
 To debug any issues with the debian_package task configuration:
 
-1. use the node-inspector:
+**1.** use the node-inspector:
 
 ```shell
 sudo npm install -g node-inspector
 node --debug-brk $(which grunt) debian_package --verbose
 ```
 
-2. in another shell process:
+**2.** in another shell process:
 
 ```shell
 node-inspector
 ```
 
-3. open the url displayed in a browser
+**3.** open the url displayed in a browser
 
 ## The "debian_package" task
 
@@ -234,14 +234,16 @@ grunt.initConfig({
 });
 ```
 
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
-## Release History
-_(Nothing yet)_
-
 ## Future Plans
 1. Add options to support custom copyright file
 2. Add options to support generation of changelist from git log
 
-[James D Bloom](http://blog.jamesdbloom.com)
+## Contributing
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+
+## Release History
+ * 2014-27-04   v0.1.0   Released debian_package task
+
+---
+
+Task submitted by [James D Bloom](http://blog.jamesdbloom.com)
