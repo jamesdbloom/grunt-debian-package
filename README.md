@@ -30,7 +30,7 @@ To print out verbose messages during packaging use --verbose, for example:
 grunt debian_package --verbose
 ```
 
-To debug any issues with the debian_package task configuration:
+To debug any issues with the **debian_package** task configuration:
 
 **1.** use the node-inspector:
 
@@ -52,6 +52,8 @@ node-inspector
 ### Overview
 In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`.
 
+Typically the options section would not need to be provided as these values are read from the **package.json** file for the project.  In this example, however, custom options are used to override the default values.  For more details on the default values see below.
+
 ```js
 grunt.initConfig({
   debian_package: {
@@ -64,7 +66,7 @@ grunt.initConfig({
         short_description: "the short description",
         long_description: "the long description added to the debian package",
         version: "2.0.0",
-        build_number: "001"
+        build_number: "1"
         links: [
             {
                 source: '/var/log/${name}',
@@ -76,7 +78,7 @@ grunt.initConfig({
             }
         ],
         directories: [
-            'usr/lib/node_modules'
+            '/var/app/${name}'
         ]
     },
     files: [
@@ -99,9 +101,55 @@ grunt.initConfig({
 });
 ```
 
-This will result in a package being created called **package_name-2.0.0_001.deb**.
+This will result in a package being created called **package_name-2.0.0-1.deb**.  The configuration above will result in the package containing all *.js, *.css and *.html files in the build directory.  These files will be installed into /var/wwww/ when the package is installed.  In addition the package will contain /var/wwww/package_name.json as a copy of the config/package_name.json file in the project.  The config above will also add two soft-links and an empty directory into the package.  
 
-TODO ADD SECTION ON SHORT AND LONG DESCRIPTION AND DPKG COMMANDS
+Using the `dpkg -c package_name-2.0.0-1.deb` command it is possible to see the package contents:
+
+```shell
+dpkg -c package_name-2.0.0-1.deb
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/package_name/
+-rw-r--r-- jenkins/jenkins       163 2014-04-27 15:08 ./usr/share/doc/package_name/changelog.Debian.gz
+-rw-r--r-- jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/package_name/copyright
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/app/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/app/package_name/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/www/
+-rwxr-xr-x jenkins/jenkins     12369 2014-04-24 05:57 ./var/www/index.html
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/www/js/
+-rw-r--r-- jenkins/jenkins      1600 2014-04-24 05:57 ./var/www/js/example.min.js
+-rw-r--r-- jenkins/jenkins      3210 2014-04-24 05:57 ./var/www/js/example.min.map
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/www/css/
+-rw-r--r-- jenkins/jenkins      1529 2014-04-24 05:57 ./var/www/css/example.css
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./etc/
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./etc/init.d/
+lrwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./etc/init.d/tomcat7 -> package_name
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/
+lrwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/tomcat7 -> package_name
+```
+
+Using the `dpkg -I package_name-2.0.0-1.deb` command it is possible to see the package information: 
+
+```shell
+dpkg -I package_name-2.0.0-1.deb
+ new debian package, version 2.0.
+ size 7300 bytes: control archive= 605 bytes.
+     226 bytes,     9 lines      control              
+     507 bytes,     7 lines      md5sums              
+ Package: package_name
+ Version: 2.0.0-1
+ Architecture: i386
+ Maintainer: James D Bloom <jamesdbloom@email.com>
+ Installed-Size: 35
+ Section: misc
+ Priority: optional
+ Description: the short description
+  the long description added to the debian package
+```
+
+To install the package use: `dpkg -i package_name-2.0.0-1.deb`
 
 ### Options
 
@@ -169,7 +217,7 @@ This task supports all the file mapping format Grunt supports. Please read [Glob
 
 #### Default Options
 
-The following example configuration shows the default values for the options.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.
+The following example configuration shows the default values for the options.  A files section is added which will add all files in the `dist` directory into the `/var/www/` directory in the package.
 
 ```js
 grunt.initConfig({
@@ -204,35 +252,6 @@ options: {
 ```
 
 **maintainer** is taken from the standard debian environment variables `DEBFULLNAME` and `DEBEMAIL`.  **name**, **short_description**, **long_description** and **version** are all read from the *package.json*.  **short_description** is taken as the first line of the `description` value and **long_description** is taken as the rest of the `description` value.  **build_number** is taken from the the environment variables `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which are the build number environment variables for Jenkins, drone.io and TravisCI respectively.
-
-#### Custom Options
-
-In this example, custom options are used to override the default values.  A files section is added which will add all files in the `dist` directory into `/var/www/` in the package.  The package created will be called **package_name-2.0.0_001.deb**.
-
-```js
-grunt.initConfig({
-  debian_package: {
-    options: {
-        maintainer: {
-            name: "James D Bloom",
-            email: "jamesdbloom@email.com"
-        },
-        name: "package_name",
-        short_description: "the short description",
-        long_description: "the long description added to the debian package",
-        version: "2.0.0",
-        build_number: "001"
-    },
-    files: {
-        src: [
-            'dist/**',
-            '!dist'
-        ]
-        dest: '/var/www/'
-    }
-  },
-});
-```
 
 ## Future Plans
 1. Add options to support custom copyright file
