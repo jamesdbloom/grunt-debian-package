@@ -101,7 +101,7 @@ grunt.initConfig({
 });
 ```
 
-This will result in a package being created called **package_name-2.0.0-1.deb**.  The configuration above will result in the package containing all *.js, *.css and *.html files in the build directory.  These files will be installed into /var/wwww/ when the package is installed.  In addition the package will contain /var/wwww/package_name.json as a copy of the config/package_name.json file in the project.  The config above will also add two soft-links and an empty directory into the package.  
+This will result in a package being created called **package_name-2.0.0-1.deb**.  The configuration above will result in the package containing all **\*.js**, **\*.css** and **\*.html** files in the **build** directory.  These files will be installed into **/var/wwww/** when the package is installed.  In addition the package will contain **/var/wwww/package_name.json** as a copy of the **config/package_name.json** file in the project.  The config above will also add two soft-links and an empty directory into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively.
 
 Using the `dpkg -c package_name-2.0.0-1.deb` command it is possible to see the package contents:
 
@@ -242,13 +242,13 @@ The second part of the version number.  This version number is intended to respr
 Type: `String`
 Default value: `undefined`
 
-This value specifies a list of soft-links that should be added into the package.  Each soft-link is specified using a `source` and a `target` value.
+This value specifies a list of soft-links that should be added into the package.  Each soft-link is specified using a `source` and a `target` value.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
 
 #### options.directories
 Type: `String`
 Default value: `undefined`
 
-This value specifies a list of directories that should be added into the package.
+This value specifies a list of directories that should be added into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
 
 ### Files
 
