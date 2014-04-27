@@ -71,7 +71,7 @@ module.exports = function (grunt) {
                 var replace = '';
 
                 for (var i = 0; i < list.length; i++) {
-                    replace += transform(list[i])
+                    replace += transform(list[i]);
                 }
 
                 findAndReplace(files, find, replace);
