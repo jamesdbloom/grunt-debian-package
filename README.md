@@ -2,6 +2,8 @@
 
 > Create debian package from grunt build
 
+Grunt plugin to create a Debian package, allowing JavaScript applications to be easily integration into a Debian or Ubuntu based continuous delivery pipeline.
+
 ## Getting Started
 This plugin requires Grunt `~0.4`
 
