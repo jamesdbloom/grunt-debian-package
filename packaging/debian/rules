@@ -1,8 +1,10 @@
 #!/usr/bin/make -f
 
+# control verbose mode.
+export DH_VERBOSE=1
+
 %:
 	dh $@
 
 clean:
-	${cleanCmd}
 	dh clean

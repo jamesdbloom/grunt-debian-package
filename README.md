@@ -27,7 +27,7 @@ grunt.loadNpmTasks('grunt-debian-package');
 ## The "debian_package" task
 
 ### Overview
-In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`. 
+In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
@@ -42,6 +42,19 @@ grunt.initConfig({
         long_description: "the long description added to the debian package",
         version: "2.0.0",
         build_number: "001"
+        links: [
+            {
+                source: '/var/log/${name}',
+                target: '/var/log/tomcat7'
+            },
+            {
+                source: '/etc/init.d/${name}',
+                target: '/etc/init.d/tomcat7'
+            }
+        ],
+        directories: [
+            'usr/lib/node_modules'
+        ]
     },
     files: [
         {
@@ -55,7 +68,7 @@ grunt.initConfig({
             dest: '/var/www/'   // Destination path prefix.
         },
         {                       // Use template in file path
-            src:  'config/<%= grunt.package.name %>.json', 
+            src:  'config/<%= grunt.package.name %>.json',
             dest: '/var/www/<%= grunt.package.name %>.json'
         }
     ]
@@ -110,6 +123,18 @@ Type: `String`
 Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER`
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
+
+#### options.links
+Type: `String`
+Default value: `undefined`
+
+This value specifies a list of soft-links that should be added into the package.  Each soft-link is specified using a `source` and a `target` value.
+
+#### options.directories
+Type: `String`
+Default value: `undefined`
+
+This value specifies a list of directories that should be added into the package.
 
 ### Files
 
@@ -195,4 +220,3 @@ _(Nothing yet)_
 ## Future Plans
 1. Custom copyright file
 2. Custom changelist (optionally based on git)
-3. Soft link support
