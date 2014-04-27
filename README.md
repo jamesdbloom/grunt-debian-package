@@ -149,7 +149,50 @@ dpkg -I package_name-2.0.0-1.deb
   the long description added to the debian package
 ```
 
-To install the package use: `dpkg -i package_name-2.0.0-1.deb`
+To install the package use: `sudo dpkg -i package_name-2.0.0-1.deb`
+
+```shell
+sudo dpkg -i package_name-2.0.0-1.deb 
+Selecting previously unselected package package_name.
+(Reading database ... 39938 files and directories currently installed.)
+Unpacking package_name (from package_name_2.0.0-1_i386.deb) ...
+Setting up package_name (2.0.0-1) ...
+Processing triggers for ureadahead ...
+```
+
+Once installed the `dpkg -l` command will list the package:
+
+```shell
+dpkg -l | grep package_name
+ package_name                     2.0.0-1                    the short description
+```
+
+And `dpkg -L package_name` will list the installed files:
+
+```shell
+dpkg -L package_name
+/.
+/usr/share/
+/usr/share/doc/
+/usr/share/doc/package_name/
+/usr/share/doc/package_name/changelog.Debian.gz
+/usr/share/doc/package_name/copyright
+/var/
+/var/app/
+/var/app/package_name/
+/var/www/
+/var/www/index.html
+/var/www/js/
+/var/www/js/example.min.js
+/var/www/js/example.min.map
+/var/www/css/
+/var/www/css/example.css
+/etc/
+/etc/init.d/
+/etc/init.d/tomcat7 -> package_name
+/var/log/
+/var/log/tomcat7 -> package_name
+```
 
 ### Options
 
