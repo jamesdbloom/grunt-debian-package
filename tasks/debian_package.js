@@ -91,6 +91,16 @@ module.exports = function (grunt) {
                     return '\tmkdir -p $(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + ' && cp -a ' + process.cwd() + '/' + filepath + ' $(DESTDIR)' + file.dest + '\n';
                 }).join('');
             });
+        },
+        cleanUp = function (options, includePackage) {
+            deleteFileOrDirectory(baseDirectory);
+            deleteFileOrDirectory(options.name + '*.dsc');
+            deleteFileOrDirectory(options.name + '*.tar.gz');
+            deleteFileOrDirectory(options.name + '*.build');
+            if (includePackage) {
+                deleteFileOrDirectory(options.name + '*.changes');
+                deleteFileOrDirectory(options.name + '*.deb');
+            }
         };
 
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
@@ -122,17 +132,12 @@ module.exports = function (grunt) {
                 done(false);
             }
 
+            cleanUp(options, true);
+            copyFileOrDirectory(__dirname + '/../' + baseDirectory, baseDirectory);
+
             // set environment variables if they are not already set
             process.env.DEBFULLNAME = options.maintainer.name;
             process.env.DEBEMAIL = options.maintainer.email;
-
-            deleteFileOrDirectory(baseDirectory);
-            deleteFileOrDirectory(options.name + '*.dsc');
-            deleteFileOrDirectory(options.name + '*.tar.gz');
-            deleteFileOrDirectory(options.name + '*.build');
-            deleteFileOrDirectory(options.name + '*.changes');
-            deleteFileOrDirectory(options.name + '*.deb');
-            copyFileOrDirectory(__dirname + '/../' + baseDirectory, baseDirectory);
 
             transformAndReplace([links], '\\$\\{softlinks\\}', options.links, function (softlink) {
                 return softlink.source + '       ' + softlink.target + '\n';
@@ -168,7 +173,8 @@ module.exports = function (grunt) {
                     }
                 });
             } else {
-                grunt.log.subhead('\'debuild\' executable not found!!');
+                cleanUp(options);
+                grunt.log.subhead('\n\'debuild\' executable not found!!');
                 grunt.log.warn('to install debuild try running \'sudo apt-get install devscripts\'');
                 done(false);
             }
