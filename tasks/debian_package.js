@@ -33,10 +33,9 @@ module.exports = function (grunt) {
                 grunt.log.errorlns('please add the \'short_description\' option in your debian_package configuration in your Gruntfile.js or add a \'description\' field to package.json');
                 valid = false;
             }
-            if (!options.short_description) {
+            if (!options.long_description) {
                 grunt.log.subhead('no long description provided!!');
                 grunt.log.errorlns('please add the \'long_description\' option in your debian_package configuration in your Gruntfile.js or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)');
-                valid = false;
             }
             return valid;
         },
@@ -129,7 +128,7 @@ module.exports = function (grunt) {
                 dirs = baseDirectory + '/debian/dirs';
 
             if (!hasValidOptions(options)) {
-                done(false);
+                return done(false);
             }
 
             cleanUp(options, true);
@@ -140,9 +139,9 @@ module.exports = function (grunt) {
             process.env.DEBEMAIL = options.maintainer.email;
 
             transformAndReplace([links], '\\$\\{softlinks\\}', options.links, function (softlink) {
-                return softlink.source + '       ' + softlink.target + '\n';
+                return softlink.target + '       ' + softlink.source + '\n';
             });
-            transformAndReplace([dirs], '\\$\\{directories\\}', options.directories, function (directory) {
+            transformAndReplace([dirs], '\\$\\{directories\\}', options.directories || [], function (directory) {
                 return directory + '\n';
             });
 
@@ -159,16 +158,21 @@ module.exports = function (grunt) {
 
             grunt.verbose.writeln('Running debuild...');
             if (grunt.file.exists('/usr/bin/debuild')) {
-                var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'dir-or-file-in-var-www'], {
+                var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
                     cwd: baseDirectory,
                     stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
                 });
                 debuild.on('exit', function (code) {
                     if (code !== 0) {
-                        grunt.log.subhead('error running debuild!!');
+                        var logFile = grunt.file.read(grunt.file.expand(options.name + '*.build'));
+                        grunt.log.subhead('\nerror running debuild!!');
+                        if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
+                            grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
+                        }
                         done(false);
                     } else {
-                        grunt.log.writeln('Created package: ' + grunt.file.expand(options.name + '*.deb'));
+                        cleanUp(options);
+                        grunt.log.ok('Created package: ' + grunt.file.expand(options.name + '*.deb'));
                         done(true);
                     }
                 });
@@ -176,7 +180,7 @@ module.exports = function (grunt) {
                 cleanUp(options);
                 grunt.log.subhead('\n\'debuild\' executable not found!!');
                 grunt.log.warn('to install debuild try running \'sudo apt-get install devscripts\'');
-                done(false);
+                return done(false);
             }
         }
     );
