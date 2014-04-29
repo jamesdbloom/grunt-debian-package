@@ -309,6 +309,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-27-04   v0.1.0   Released debian_package task
  * 2014-28-04   v0.1.1   Fixed issue with some dependencies listed as `devDependencies` instead of `dependencies`
  * 2014-28-04   v0.1.2   Add back missing dirs and links files and improve clean-up after failure
+ * 2014-28-04   v0.1.3   Removed requirement for long descriptions to be compulsory
 
 ---
 
