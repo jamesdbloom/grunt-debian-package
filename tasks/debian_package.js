@@ -15,15 +15,20 @@ module.exports = function (grunt) {
         return str.replace(new RegExp(find, 'g'), replace);
     };
 
-    var baseDirectory = 'packaging',
+    var packagingFilesDirectory = 'packaging',
         hasValidOptions = function (options) {
             var valid = true;
-            if (!options.maintainer.name) {
+            if (!options.maintainer) {
+                grunt.log.subhead('no maintainer details provided!!');
+                grunt.log.errorlns('please add the \'maintainer\' option specifying the name and email in your debian_package configuration in your Gruntfile.js or add \'DEBFULLNAME\' and \'DEBEMAIL\' environment variable (i.e. export DEBFULLNAME="James D Bloom" && export DEBEMAIL="jamesdbloom@email.com")');
+                valid = false;
+            }
+            if (options.maintainer && !options.maintainer.name) {
                 grunt.log.subhead('no maintainer name provided!!');
                 grunt.log.errorlns('please add the \'maintainer.name\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBFULLNAME\' environment variable (i.e. export DEBFULLNAME="James D Bloom")');
                 valid = false;
             }
-            if (!options.maintainer.email) {
+            if (options.maintainer && !options.maintainer.email) {
                 grunt.log.subhead('no maintainer email provided!!');
                 grunt.log.errorlns('please add the \'maintainer.email\' option in your debian_package configuration in your Gruntfile.js or add a \'DEBEMAIL\' environment variable (i.e. export DEBEMAIL="jamesdbloom@email.com")');
                 valid = false;
@@ -44,6 +49,7 @@ module.exports = function (grunt) {
             grunt.file.delete(grunt.file.expand(path), {force: true});
         },
         copyFileOrDirectory = function (source, destination) {
+            grunt.file.mkdir(destination);
             grunt.file.expand(source).forEach(function (file) {
                 if (grunt.file.isDir(file)) {
                     grunt.file.recurse(file, function callback(abspath, rootdir, subdir, filename) {
@@ -76,8 +82,8 @@ module.exports = function (grunt) {
                 findAndReplace(files, find, replace);
             }
         },
-        preparePackageContents = function (files) {
-            transformAndReplace([baseDirectory + '/Makefile'], '\\$\\{file_list\\}', files, function (file) {
+        preparePackageContents = function (makefile, files) {
+            transformAndReplace([makefile], '\\$\\{file_list\\}', files, function (file) {
                 return file.src.filter(function (filepath) {
                     if (!grunt.file.exists(filepath)) {
                         grunt.log.warn('File \'' + filepath + '\' not found');
@@ -92,10 +98,12 @@ module.exports = function (grunt) {
             });
         },
         cleanUp = function (options, includePackage) {
-            deleteFileOrDirectory(baseDirectory);
-            deleteFileOrDirectory(options.name + '*.dsc');
-            deleteFileOrDirectory(options.name + '*.tar.gz');
-            deleteFileOrDirectory(options.name + '*.build');
+            if (!grunt.option('verbose')) {
+                deleteFileOrDirectory(options.working_directory);
+                deleteFileOrDirectory(options.name + '*.dsc');
+                deleteFileOrDirectory(options.name + '*.tar.gz');
+                deleteFileOrDirectory(options.name + '*.build');
+            }
             if (includePackage) {
                 deleteFileOrDirectory(options.name + '*.changes');
                 deleteFileOrDirectory(options.name + '*.deb');
@@ -105,7 +113,7 @@ module.exports = function (grunt) {
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
             // tell Grunt this task is asynchronous.
             var done = this.async();
-
+            debugger;
             // Merge task-specific and/or target-specific options with these defaults.
             var pkg = grunt.file.readJSON('package.json'),
                 options = this.options({
@@ -117,28 +125,31 @@ module.exports = function (grunt) {
                     short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
                     long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
                     version: pkg.version,
-                    build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1'
+                    build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
+                    working_directory: 'tmp/'
                 }),
                 spawn = require('child_process').spawn,
                 dateFormat = require('dateformat'),
                 now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
-                changelog = baseDirectory + '/debian/changelog',
-                control = baseDirectory + '/debian/control',
-                links = baseDirectory + '/debian/links',
-                dirs = baseDirectory + '/debian/dirs';
+                temp_directory = options.working_directory + packagingFilesDirectory,
+                changelog = temp_directory + '/debian/changelog',
+                control = temp_directory + '/debian/control',
+                links = temp_directory + '/debian/links',
+                dirs = temp_directory + '/debian/dirs',
+                makefile = temp_directory + '/Makefile';
 
             if (!hasValidOptions(options)) {
                 return done(false);
             }
 
             cleanUp(options, true);
-            copyFileOrDirectory(__dirname + '/../' + baseDirectory, baseDirectory);
+            copyFileOrDirectory(__dirname + '/../' + packagingFilesDirectory, temp_directory);
 
             // set environment variables if they are not already set
             process.env.DEBFULLNAME = options.maintainer.name;
             process.env.DEBEMAIL = options.maintainer.email;
 
-            transformAndReplace([links], '\\$\\{softlinks\\}', options.links, function (softlink) {
+            transformAndReplace([links], '\\$\\{softlinks\\}', options.links || [], function (softlink) {
                 return softlink.target + '       ' + softlink.source + '\n';
             });
             transformAndReplace([dirs], '\\$\\{directories\\}', options.directories || [], function (directory) {
@@ -154,33 +165,35 @@ module.exports = function (grunt) {
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
 
-            preparePackageContents(this.files);
+            preparePackageContents(makefile, this.files);
 
-            grunt.verbose.writeln('Running debuild...');
+            grunt.verbose.writeln('Running \'debuild --no-tgz-check -sa -us -uc --lintian-opts --suppress-tags tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www\'');
             if (grunt.file.exists('/usr/bin/debuild')) {
-                var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
-                    cwd: baseDirectory,
-                    stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
-                });
-                debuild.on('exit', function (code) {
-                    if (code !== 0) {
-                        var logFile = grunt.file.read(grunt.file.expand(options.name + '*.build'));
-                        grunt.log.subhead('\nerror running debuild!!');
-                        if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
-                            grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
+                if (!options.simulate) {
+                    var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
+                        cwd: packagingFilesDirectory,
+                        stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
+                    });
+                    debuild.on('exit', function (code) {
+                        if (code !== 0) {
+                            var logFile = grunt.file.read(grunt.file.expand(options.name + '*.build'));
+                            grunt.log.subhead('\nerror running debuild!!');
+                            if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
+                                grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
+                            }
+                            done(false);
+                        } else {
+                            cleanUp(options);
+                            grunt.log.ok('Created package: ' + grunt.file.expand(options.name + '*.deb'));
+                            done(true);
                         }
-                        done(false);
-                    } else {
-                        cleanUp(options);
-                        grunt.log.ok('Created package: ' + grunt.file.expand(options.name + '*.deb'));
-                        done(true);
-                    }
-                });
+                    });
+                }
             } else {
                 cleanUp(options);
                 grunt.log.subhead('\n\'debuild\' executable not found!!');
                 grunt.log.warn('to install debuild try running \'sudo apt-get install devscripts\'');
-                return done(false);
+                return done(options.simulate);
             }
         }
     );

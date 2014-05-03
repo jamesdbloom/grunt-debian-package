@@ -68,7 +68,7 @@ grunt.initConfig({
         short_description: "the short description",
         long_description: "the long description added to the debian package",
         version: "2.0.0",
-        build_number: "1"
+        build_number: "1",
         links: [
             {
                 source: '/var/log/${name}',
@@ -85,16 +85,16 @@ grunt.initConfig({
     },
     files: [
         {
-            expand: true,       // Enable dynamic expansion.
-            cwd: 'build/',      // Src matches are relative to this path.
-            src: [              // Actual pattern(s) to match.
+            expand: true,       // enable dynamic expansion
+            cwd: 'build/',      // src matches are relative to this path
+            src: [              // actual pattern(s) to match
                 '**/*.js',
                 '**/*.html',
                 '**/*.css'
             ],
-            dest: '/var/www/'   // Destination path prefix.
+            dest: '/var/www/'   // destination path prefix
         },
-        {                       // Use template in file path
+        {                       // use template in file path
             src:  'config/<%= grunt.package.name %>.json',
             dest: '/var/www/<%= grunt.package.name %>.json'
         }
@@ -310,6 +310,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-28-04   v0.1.1   Fixed issue with some dependencies listed as `devDependencies` instead of `dependencies`
  * 2014-28-04   v0.1.2   Add back missing dirs and links files and improve clean-up after failure
  * 2014-28-04   v0.1.3   Removed requirement for long descriptions to be compulsory
+ * 2014-28-04   v0.1.4   Added test framework and fixed multiple minor bugs with default config
 
 ---
 
