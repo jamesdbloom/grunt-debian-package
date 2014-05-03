@@ -1,4 +1,4 @@
-# grunt-debian-package
+# grunt-debian-package [![Build Status](https://secure.travis-ci.org/jamesdbloom/grunt-debian-package.png?branch=master)](http://travis-ci.org/jamesdbloom/grunt-debian-package)
 
 > Create debian package from grunt build
 
