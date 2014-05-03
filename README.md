@@ -1,9 +1,11 @@
-# grunt-debian-package [![Build Status](https://secure.travis-ci.org/jamesdbloom/grunt-debian-package.png?branch=master)](http://travis-ci.org/jamesdbloom/grunt-debian-package)  [![Dependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package.png)](https://david-dm.org/jamesdbloom/grunt-debian-package) [![devDependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package/dev-status.png)](https://david-dm.org/jamesdbloom/grunt-debian-package#info=devDependencies)
-
+# grunt-debian-package 
 
 > Create debian package from grunt build
 
 Grunt plugin to create a Debian package, allowing JavaScript applications to be easily integration into a Debian or Ubuntu based continuous delivery pipeline.
+
+[![Build Status](https://secure.travis-ci.org/jamesdbloom/grunt-debian-package.png?branch=master)](http://travis-ci.org/jamesdbloom/grunt-debian-package)  [![Dependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package.png)](https://david-dm.org/jamesdbloom/grunt-debian-package) [![devDependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package/dev-status.png)](https://david-dm.org/jamesdbloom/grunt-debian-package#info=devDependencies)
+
 
 [![NPM](https://nodei.co/npm/grunt-debian-package.png?downloads=true&stars=true)](https://nodei.co/npm/grunt-debian-package/)
 
