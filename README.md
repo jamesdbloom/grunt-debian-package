@@ -5,7 +5,7 @@
 Grunt plugin to create a Debian package, allowing JavaScript applications to be easily integration into a Debian or Ubuntu based continuous delivery pipeline.
 
 [![Build Status](https://secure.travis-ci.org/jamesdbloom/grunt-debian-package.png?branch=master)](http://travis-ci.org/jamesdbloom/grunt-debian-package)  [![Dependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package.png)](https://david-dm.org/jamesdbloom/grunt-debian-package) [![devDependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package/dev-status.png)](https://david-dm.org/jamesdbloom/grunt-debian-package#info=devDependencies) [![Code Climate](https://codeclimate.com/github/jamesdbloom/grunt-debian-package.png)](https://codeclimate.com/github/jamesdbloom/grunt-debian-package)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jamesdbloom/grunt-debian-package/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Stories in Backlog](https://badge.waffle.io/jamesdbloom/mockserver.png?label=backlog&title=Backlog)](https://waffle.io/jamesdbloom/mockserver)
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jamesdbloom/grunt-debian-package/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![Stories in Backlog](https://badge.waffle.io/jamesdbloom/grunt-debian-package.png?label=backlog&title=Backlog)](https://waffle.io/jamesdbloom/grunt-debian-package)
 
 
 
