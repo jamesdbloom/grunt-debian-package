@@ -113,7 +113,7 @@ module.exports = function (grunt) {
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
             // tell Grunt this task is asynchronous.
             var done = this.async();
-            debugger;
+
             // Merge task-specific and/or target-specific options with these defaults.
             var pkg = grunt.file.readJSON('package.json'),
                 options = this.options({
