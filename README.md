@@ -318,6 +318,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-28-04   v0.1.2   Add back missing dirs and links files and improve clean-up after failure
  * 2014-29-04   v0.1.3   Removed requirement for long descriptions to be compulsory
  * 2014-03-05   v0.1.4   Added test framework and fixed multiple minor bugs with default config
+ * 2014-15-05   v0.1.5   Fixing bugs with directory structure and adding support for dput
 
 ---
 

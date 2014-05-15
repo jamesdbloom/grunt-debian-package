@@ -1,4 +1,4 @@
-${name} (${version}-${build_number}) UNRELEASED; urgency=low
+${name} (${version}-${build_number}) experimental; urgency=low
 
   * Initial release. (Closes: #XXXXXX)
 

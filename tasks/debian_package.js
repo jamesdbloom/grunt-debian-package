@@ -45,8 +45,10 @@ module.exports = function (grunt) {
             return valid;
         },
         deleteFileOrDirectory = function (path) {
-            grunt.verbose.writeln('Deleting: \'' + path + '\'');
-            grunt.file.delete(grunt.file.expand(path), {force: true});
+            if (grunt.file.expand(path).length > 0) {
+                grunt.verbose.writeln('Deleting: \'' + grunt.file.expand(path) + '\'');
+                // grunt.file.delete(grunt.file.expand(path), {force: true});
+            }
         },
         copyFileOrDirectory = function (source, destination) {
             grunt.file.mkdir(destination);
@@ -100,13 +102,13 @@ module.exports = function (grunt) {
         cleanUp = function (options, includePackage) {
             if (!grunt.option('verbose')) {
                 deleteFileOrDirectory(options.working_directory);
-                deleteFileOrDirectory(options.name + '*.dsc');
-                deleteFileOrDirectory(options.name + '*.tar.gz');
-                deleteFileOrDirectory(options.name + '*.build');
+                deleteFileOrDirectory(options.working_directory + packagingFilesDirectory);
+                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.tar.gz');
+                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.build');
             }
             if (includePackage) {
-                deleteFileOrDirectory(options.name + '*.changes');
-                deleteFileOrDirectory(options.name + '*.deb');
+                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.changes');
+                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.deb');
             }
         };
 
@@ -171,12 +173,12 @@ module.exports = function (grunt) {
             if (grunt.file.exists('/usr/bin/debuild')) {
                 if (!options.simulate) {
                     var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
-                        cwd: packagingFilesDirectory,
+                        cwd: temp_directory,
                         stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
                     });
                     debuild.on('exit', function (code) {
                         if (code !== 0) {
-                            var logFile = grunt.file.read(grunt.file.expand(options.name + '*.build'));
+                            var logFile = grunt.file.read(grunt.file.expand(options.working_directory + '/' + options.name + '*.build'));
                             grunt.log.subhead('\nerror running debuild!!');
                             if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
                                 grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
@@ -184,8 +186,28 @@ module.exports = function (grunt) {
                             done(false);
                         } else {
                             cleanUp(options);
-                            grunt.log.ok('Created package: ' + grunt.file.expand(options.name + '*.deb'));
-                            done(true);
+                            grunt.log.ok('Created package: ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.deb'));
+                            if (options.respository) {
+                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.changes') + '\'');
+                                var dputArguments = [options.respository, grunt.file.expand(options.working_directory + '/' + options.name + '*.changes')];
+                                if (grunt.option('verbose')) {
+                                    dputArguments.unshift('-d');
+                                }
+                                var dput = spawn('dput', dputArguments, {
+                                    cwd: temp_directory,
+                                    stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
+                                });
+                                dput.on('exit', function (code) {
+                                    if (code !== 0) {
+                                        grunt.log.subhead('\nerror uploading package using dput!!');
+                                    } else {
+                                        grunt.log.ok('Uploaded package: ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.deb'));
+                                    }
+                                    done(true);
+                                });
+                            } else {
+                                done(true);
+                            }
                         }
                     });
                 }
