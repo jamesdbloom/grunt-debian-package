@@ -1,7 +1,7 @@
 {
     "name": "grunt-debian-package",
     "description": "Create debian package from grunt build",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "homepage": "https://github.com/jamesdbloom/grunt-debian-package",
     "author": {
         "name": "James Bloom",
