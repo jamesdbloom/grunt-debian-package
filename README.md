@@ -314,11 +314,12 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
  * 2014-27-04   v0.1.0   Released debian_package task
- * 2014-28-04   v0.1.1   Fixed issue with some dependencies listed as `devDependencies` instead of `dependencies`
- * 2014-28-04   v0.1.2   Add back missing dirs and links files and improve clean-up after failure
- * 2014-29-04   v0.1.3   Removed requirement for long descriptions to be compulsory
- * 2014-03-05   v0.1.4   Added test framework and fixed multiple minor bugs with default config
- * 2014-15-05   v0.1.5   Fixing bugs with directory structure and adding support for dput
+ * 2014-28-04   v0.1.1   Fixed issue with some dependencies
+ * 2014-28-04   v0.1.2   Add back missing dirs and links files
+ * 2014-29-04   v0.1.3   Removed requirement for long descriptions
+ * 2014-03-05   v0.1.4   Added test framework and fixed bugs
+ * 2014-15-05   v0.1.5   Added support for dput
+ * 2014-16-05   v0.1.6   Fixed errors with package upload
 
 ---
 
