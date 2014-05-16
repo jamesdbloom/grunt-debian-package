@@ -99,17 +99,22 @@ module.exports = function (grunt) {
                 }).join('');
             });
         },
-        cleanUp = function (options, includePackage) {
-            if (!grunt.option('verbose')) {
+        cleanUp = function (options, force) {
+            if (force) {
                 deleteFileOrDirectory(options.working_directory);
                 deleteFileOrDirectory(options.working_directory + packagingFilesDirectory);
-                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.tar.gz');
-                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.build');
+                deleteFileOrDirectory(packageName(options) + '*.tar.gz');
+                deleteFileOrDirectory(packageName(options) + '*.build');
+                deleteFileOrDirectory(packageName(options) + '*.changes');
+                deleteFileOrDirectory(packageName(options) + '*.deb');
+            } else if (!grunt.option('verbose')) {
+                deleteFileOrDirectory(options.working_directory + packagingFilesDirectory);
+                deleteFileOrDirectory(packageName(options) + '*.tar.gz');
+                deleteFileOrDirectory(packageName(options) + '*.build');
             }
-            if (includePackage) {
-                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.changes');
-                deleteFileOrDirectory(options.working_directory + '/' + options.name + '*.deb');
-            }
+        },
+        packageName = function (options) {
+            return options.working_directory + '/' + options.prefix + options.name;
         };
 
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
@@ -124,6 +129,7 @@ module.exports = function (grunt) {
                         email: process.env.DEBEMAIL
                     },
                     name: pkg.name,
+                    prefix: "",
                     short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
                     long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
                     version: pkg.version,
@@ -161,7 +167,7 @@ module.exports = function (grunt) {
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
             findAndReplace([changelog], '\\$\\{date\\}', now);
-            findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', options.name);
+            findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', options.prefix + options.name);
             findAndReplace([control], '\\$\\{short_description\\}', options.short_description);
             findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
@@ -178,7 +184,7 @@ module.exports = function (grunt) {
                     });
                     debuild.on('exit', function (code) {
                         if (code !== 0) {
-                            var logFile = grunt.file.read(grunt.file.expand(options.working_directory + '/' + options.name + '*.build'));
+                            var logFile = grunt.file.read(grunt.file.expand(packageName(options) + '*.build'));
                             grunt.log.subhead('\nerror running debuild!!');
                             if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
                                 grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
@@ -186,22 +192,22 @@ module.exports = function (grunt) {
                             done(false);
                         } else {
                             cleanUp(options);
-                            grunt.log.ok('Created package: ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.deb'));
+                            grunt.log.ok('Created package: ' + grunt.file.expand(packageName(options) + '*.deb'));
                             if (options.respository) {
-                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.changes') + '\'');
-                                var dputArguments = [options.respository, grunt.file.expand(options.working_directory + '/' + options.name + '*.changes')];
+                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageName(options) + '*.changes') + '\'');
+                                require('fs').chmodSync("" + grunt.file.expand(packageName(options) + '*.changes'), "744");
+                                var dputArguments = [options.respository, grunt.file.expand(packageName(options) + '*.changes')];
                                 if (grunt.option('verbose')) {
                                     dputArguments.unshift('-d');
                                 }
                                 var dput = spawn('dput', dputArguments, {
-                                    cwd: temp_directory,
                                     stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
                                 });
                                 dput.on('exit', function (code) {
                                     if (code !== 0) {
                                         grunt.log.subhead('\nerror uploading package using dput!!');
                                     } else {
-                                        grunt.log.ok('Uploaded package: ' + grunt.file.expand(options.working_directory + '/' + options.name + '*.deb'));
+                                        grunt.log.ok('Uploaded package: ' + grunt.file.expand(packageName(options) + '*.deb'));
                                     }
                                     done(true);
                                 });
@@ -219,5 +225,4 @@ module.exports = function (grunt) {
             }
         }
     );
-
 };
