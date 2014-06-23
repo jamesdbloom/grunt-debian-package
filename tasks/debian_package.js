@@ -103,18 +103,21 @@ module.exports = function (grunt) {
             if (force) {
                 deleteFileOrDirectory(options.working_directory);
                 deleteFileOrDirectory(options.working_directory + packagingFilesDirectory);
-                deleteFileOrDirectory(packageName(options) + '*.tar.gz');
-                deleteFileOrDirectory(packageName(options) + '*.build');
-                deleteFileOrDirectory(packageName(options) + '*.changes');
-                deleteFileOrDirectory(packageName(options) + '*.deb');
+                deleteFileOrDirectory(packageLocation(options) + '*.tar.gz');
+                deleteFileOrDirectory(packageLocation(options) + '*.build');
+                deleteFileOrDirectory(packageLocation(options) + '*.changes');
+                deleteFileOrDirectory(packageLocation(options) + '*.deb');
             } else if (!grunt.option('verbose')) {
                 deleteFileOrDirectory(options.working_directory + packagingFilesDirectory);
-                deleteFileOrDirectory(packageName(options) + '*.tar.gz');
-                deleteFileOrDirectory(packageName(options) + '*.build');
+                deleteFileOrDirectory(packageLocation(options) + '*.tar.gz');
+                deleteFileOrDirectory(packageLocation(options) + '*.build');
             }
         },
         packageName = function (options) {
-            return options.working_directory + '/' + options.prefix + options.name;
+            return options.prefix + options.name + options.postfix;
+        },
+        packageLocation = function (options) {
+            return options.working_directory + '/' + packageName(options);
         };
 
     grunt.registerMultiTask('debian_package', 'Create debian package from grunt build', function () {
@@ -130,6 +133,7 @@ module.exports = function (grunt) {
                     },
                     name: pkg.name,
                     prefix: "",
+                    postfix: "",
                     short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
                     long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
                     version: pkg.version,
@@ -167,7 +171,7 @@ module.exports = function (grunt) {
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
             findAndReplace([changelog], '\\$\\{date\\}', now);
-            findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', options.prefix + options.name);
+            findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', packageName(options));
             findAndReplace([control], '\\$\\{short_description\\}', options.short_description);
             findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
@@ -184,7 +188,7 @@ module.exports = function (grunt) {
                     });
                     debuild.on('exit', function (code) {
                         if (code !== 0) {
-                            var logFile = grunt.file.read(grunt.file.expand(packageName(options) + '*.build'));
+                            var logFile = grunt.file.read(grunt.file.expand(packageLocation(options) + '*.build'));
                             grunt.log.subhead('\nerror running debuild!!');
                             if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
                                 grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
@@ -192,11 +196,11 @@ module.exports = function (grunt) {
                             done(false);
                         } else {
                             cleanUp(options);
-                            grunt.log.ok('Created package: ' + grunt.file.expand(packageName(options) + '*.deb'));
+                            grunt.log.ok('Created package: ' + grunt.file.expand(packageLocation(options) + '*.deb'));
                             if (options.respository) {
-                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageName(options) + '*.changes') + '\'');
-                                require('fs').chmodSync("" + grunt.file.expand(packageName(options) + '*.changes'), "744");
-                                var dputArguments = [options.respository, grunt.file.expand(packageName(options) + '*.changes')];
+                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
+                                require('fs').chmodSync("" + grunt.file.expand(packageLocation(options) + '*.changes'), "744");
+                                var dputArguments = [options.respository, grunt.file.expand(packageLocation(options) + '*.changes')];
                                 if (grunt.option('verbose')) {
                                     dputArguments.unshift('-d');
                                 }
@@ -207,7 +211,7 @@ module.exports = function (grunt) {
                                     if (code !== 0) {
                                         grunt.log.subhead('\nerror uploading package using dput!!');
                                     } else {
-                                        grunt.log.ok('Uploaded package: ' + grunt.file.expand(packageName(options) + '*.deb'));
+                                        grunt.log.ok('Uploaded package: ' + grunt.file.expand(packageLocation(options) + '*.deb'));
                                     }
                                     done(true);
                                 });

@@ -71,7 +71,9 @@ grunt.initConfig({
             name: "James D Bloom",
             email: "jamesdbloom@email.com"
         },
+        prefix: "prefix-",
         name: "package_name",
+        postfix: "-postfix",
         short_description: "the short description",
         long_description: "the long description added to the debian package",
         version: "2.0.0",
@@ -110,18 +112,18 @@ grunt.initConfig({
 });
 ```
 
-This will result in a package being created called **package_name-2.0.0-1.deb**.  The configuration above will result in the package containing all **\*.js**, **\*.css** and **\*.html** files in the **build** directory.  These files will be installed into **/var/wwww/** when the package is installed.  In addition the package will contain **/var/wwww/package_name.json** as a copy of the **config/package_name.json** file in the project.  The config above will also add two soft-links and an empty directory into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively.
+This will result in a package being created called **prefix-package_name-postfix-2.0.0-1.deb**.  The configuration above will result in the package containing all **\*.js**, **\*.css** and **\*.html** files in the **build** directory.  These files will be installed into **/var/wwww/** when the package is installed.  In addition the package will contain **/var/wwww/package_name.json** as a copy of the **config/package_name.json** file in the project.  The config above will also add two soft-links and an empty directory into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively.
 
 Using the `dpkg -c package_name-2.0.0-1.deb` command it is possible to see the package contents:
 
 ```shell
-dpkg -c package_name-2.0.0-1.deb
+dpkg -c prefix-package_name-postfix-2.0.0-1.deb
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/
-drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/package_name/
--rw-r--r-- jenkins/jenkins       163 2014-04-27 15:08 ./usr/share/doc/package_name/changelog.Debian.gz
--rw-r--r-- jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/package_name/copyright
+drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/prefix-package_name-postfix/
+-rw-r--r-- jenkins/jenkins       163 2014-04-27 15:08 ./usr/share/doc/prefix-package_name-postfix/changelog.Debian.gz
+-rw-r--r-- jenkins/jenkins         0 2014-04-27 15:08 ./usr/share/doc/prefix-package_name-postfix/copyright
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/app/
 drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/app/package_name/
@@ -139,15 +141,15 @@ drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/
 lrwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/tomcat7 -> package_name
 ```
 
-Using the `dpkg -I package_name-2.0.0-1.deb` command it is possible to see the package information: 
+Using the `dpkg -I prefix-package_name-postfix-2.0.0-1.deb` command it is possible to see the package information: 
 
 ```shell
-dpkg -I package_name-2.0.0-1.deb
+dpkg -I prefix-package_name-postfix-2.0.0-1.deb
  new debian package, version 2.0.
  size 7300 bytes: control archive= 605 bytes.
      226 bytes,     9 lines      control              
      507 bytes,     7 lines      md5sums              
- Package: package_name
+ Package: prefix-package_name-postfix
  Version: 2.0.0-1
  Architecture: i386
  Maintainer: James D Bloom <jamesdbloom@email.com>
@@ -158,34 +160,34 @@ dpkg -I package_name-2.0.0-1.deb
   the long description added to the debian package
 ```
 
-To install the package use: `sudo dpkg -i package_name-2.0.0-1.deb`
+To install the package use: `sudo dpkg -i prefix-package_name-postfix-2.0.0-1.deb`
 
 ```shell
-sudo dpkg -i package_name-2.0.0-1.deb 
-Selecting previously unselected package package_name.
+sudo dpkg -i prefix-package_name-postfix-2.0.0-1.deb 
+Selecting previously unselected package prefix-package_name-postfix.
 (Reading database ... 39938 files and directories currently installed.)
-Unpacking package_name (from package_name_2.0.0-1_i386.deb) ...
-Setting up package_name (2.0.0-1) ...
+Unpacking prefix-package_name-postfix (from package_name_2.0.0-1_i386.deb) ...
+Setting up prefix-package_name-postfix (2.0.0-1) ...
 Processing triggers for ureadahead ...
 ```
 
 Once installed the `dpkg -l` command will list the package:
 
 ```shell
-dpkg -l | grep package_name
- package_name                     2.0.0-1                    the short description
+dpkg -l | grep prefix-package_name-postfix
+ prefix-package_name-postfix                     2.0.0-1                    the short description
 ```
 
-And `dpkg -L package_name` will list the installed files:
+And `dpkg -L prefix-package_name-postfix` will list the installed files:
 
 ```shell
-dpkg -L package_name
+dpkg -L prefix-package_name-postfix
 /.
 /usr/share/
 /usr/share/doc/
-/usr/share/doc/package_name/
-/usr/share/doc/package_name/changelog.Debian.gz
-/usr/share/doc/package_name/copyright
+/usr/share/doc/prefix-package_name-postfix/
+/usr/share/doc/prefix-package_name-postfix/changelog.Debian.gz
+/usr/share/doc/prefix-package_name-postfix/copyright
 /var/
 /var/app/
 /var/app/package_name/
@@ -217,11 +219,23 @@ Default value: `process.env.DEBEMAIL`
 
 This value specifies the maintainer's email for the debian package.  The default value is taken from the standard debian environment variable `DEBEMAIL`.
 
+#### options.prefix
+Type: `String`
+Default value: ''
+
+This value specifies a prefix for the debian package name.  This is useful is the package name is taken from the package.json but requires a prefix (i.e. for company name).
+
 #### options.name
 Type: `String`
 Default value: **package.json** `name`
 
 This value specifies the name of the debian package.  The default value is taken from the package.json name value.
+
+#### options.postfix
+Type: `String`
+Default value: ''
+
+This value specifies a postfix for the debian package name.  This is useful is the package name is taken from the package.json but requires a postfix (i.e. for git branch).
 
 #### options.short_description
 Type: `String`
@@ -320,6 +334,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-03-05   v0.1.4   Added test framework and fixed bugs
  * 2014-15-05   v0.1.5   Added support for dput
  * 2014-16-05   v0.1.6   Fixed errors with package upload
+ * 2014-23-06   v0.1.7   Added support for postfix
 
 ---
 

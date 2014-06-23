@@ -53,7 +53,9 @@ module.exports = function (grunt) {
                         name: "James D Bloom",
                         email: "jamesdbloom@email.com"
                     },
+                    prefix: "prefix-",
                     name: "package_name",
+                    postfix: "-postfix",
                     short_description: "the short description",
                     long_description: "the long description added to the debian package",
                     version: "2.0.0",
