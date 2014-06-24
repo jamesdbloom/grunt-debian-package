@@ -335,6 +335,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-15-05   v0.1.5   Added support for dput
  * 2014-16-05   v0.1.6   Fixed errors with package upload
  * 2014-23-06   v0.1.7   Added support for postfix
+ * 2014-24-06   v0.1.8   Minor tweaks and better test coverage
 
 ---
 

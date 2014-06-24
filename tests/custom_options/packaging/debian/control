@@ -1,0 +1,12 @@
+Source: prefix-package_name-postfix
+Maintainer: James D Bloom <jamesdbloom@email.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 9)
+
+Package: prefix-package_name-postfix
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: the short description
+ the long description added to the debian package

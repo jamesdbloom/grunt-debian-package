@@ -1,0 +1,2 @@
+/var/log/tomcat7       /var/log/prefix-package_name-postfix
+/etc/init.d/tomcat7       /etc/init.d/prefix-package_name-postfix

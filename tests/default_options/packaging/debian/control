@@ -1,0 +1,12 @@
+Source: grunt-debian-package
+Maintainer: James D Bloom <jamesdbloom@email.com>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 9)
+
+Package: grunt-debian-package
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Create debian package from grunt build
+

@@ -168,6 +168,11 @@ module.exports = function (grunt) {
                 return directory + '\n';
             });
 
+            if (options.long_description) {
+                // add extra space at start to ensure format is correct and allow simple unit test comparisons
+                options.long_description = ' ' + options.long_description;
+            }
+
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
             findAndReplace([changelog], '\\$\\{date\\}', now);

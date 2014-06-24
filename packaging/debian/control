@@ -9,4 +9,4 @@ Package: ${name}
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: ${short_description}
- ${long_description}
+${long_description}

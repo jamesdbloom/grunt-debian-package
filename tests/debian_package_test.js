@@ -22,19 +22,34 @@ var grunt = require('grunt');
  test.ifError(value)
  */
 
+var compareDirectories = function (test, source, destination) {
+    grunt.file.recurse(source, function callback(abspath, rootdir, subdir, filename) {
+        if (abspath !== 'tests/default_options/packaging/debian/changelog' && abspath !== 'tests/custom_options/packaging/debian/changelog') {
+
+            var message = '\n\n' +
+                'Comparing: \'' + abspath + '\' to \'' + destination + '/' + (subdir ? subdir + '/' : '') + filename +
+                '\'\n\n' +
+                'Expected:\n\'' +
+                '' + grunt.file.read(abspath) +
+                '\'\n\n' +
+                'But Found:\n\'' +
+                '' + grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename) + '\');';
+
+            test.equal(grunt.file.read(abspath), grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename), message);
+        }
+    });
+    test.done();
+};
+
 exports.debian_package = {
     setUp: function (done) {
         // setup here if necessary
         done();
     },
     default_options: function (test) {
-        test.expect(1);
-        test.equal(true, true);
-        test.done();
+        compareDirectories(test, 'tests/default_options', 'tmp');
     },
     custom_options: function (test) {
-        test.expect(1);
-        test.equal(true, true);
-        test.done();
+        compareDirectories(test, 'tests/custom_options', 'custom_tmp');
     }
 };
