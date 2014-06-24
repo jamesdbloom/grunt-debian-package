@@ -108,11 +108,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-// Disabling tests until issue with pathname on TravisCI is fixed
+    grunt.registerTask('test', ['clean', 'debian_package', 'nodeunit']);
 
-//    grunt.registerTask('test', ['clean', 'debian_package', 'nodeunit']);
-
-//    grunt.registerTask('default', ['jshint', 'test']);
-
-    grunt.registerTask('default', ['jshint']);
+    grunt.registerTask('default', ['jshint', 'test']);
+    grunt.registerTask('travis', 'jshint');
 };
