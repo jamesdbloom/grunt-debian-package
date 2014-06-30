@@ -39,11 +39,8 @@ module.exports = function (grunt) {
                 },
                 files: [
                     {
-                        expand: true,       // enable dynamic expansion
-                        src: [              // actual pattern(s) to match
-                            'tasks/**/*.js'
-                        ],
-                        dest: '/var/www/'   // destination path prefix
+                        src: 'tasks/debian_package.js',
+                        dest: '/var/www/tasks/debian_package.js'
                     }
                 ]
             },
@@ -78,18 +75,19 @@ module.exports = function (grunt) {
                 },
                 files: [
                     {
+                        expand: true,
+                        cwd: 'tasks',
                         src: [
-                            'build/cache/linux64/0.9.2/nw.pak',
-                            'build/cache/linux64/0.9.2/nw',
-                            'build/cache/linux64/0.9.2/libffmpegsumo.so'
+                            '**/*.js'
                         ],
-                        dest: 'foo/nw/'
+                        dest: '/var/www/tasks'
                     },
                     {
-                        expand: true,
-                        cwd: 'src/',
-                        src: '**',
-                        dest: 'foo/src/'
+                        src: [
+                            'tests/custom_options/packaging/debian/changelog',
+                            'tests/custom_options/packaging/debian/control'
+                        ],
+                        dest: '/var/www/'
                     }
                 ]
             }
@@ -111,5 +109,5 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['clean', 'debian_package', 'nodeunit']);
 
     grunt.registerTask('default', ['jshint', 'test']);
-    grunt.registerTask('travis', 'jshint');
+    grunt.registerTask('travis', ['jshint', 'test']);
 };

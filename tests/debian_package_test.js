@@ -22,20 +22,29 @@ var grunt = require('grunt');
  test.ifError(value)
  */
 
+function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(string, find, replace) {
+    return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 var compareDirectories = function (test, source, destination) {
     grunt.file.recurse(source, function callback(abspath, rootdir, subdir, filename) {
         if (abspath !== 'tests/default_options/packaging/debian/changelog' && abspath !== 'tests/custom_options/packaging/debian/changelog') {
 
+            var expected = replaceAll(grunt.file.read(abspath), '${current_dir}', process.cwd());
             var message = '\n\n' +
                 'Comparing: \'' + abspath + '\' to \'' + destination + '/' + (subdir ? subdir + '/' : '') + filename +
                 '\'\n\n' +
                 'Expected:\n\'' +
-                '' + grunt.file.read(abspath) +
+                '' + expected +
                 '\'\n\n' +
                 'But Found:\n\'' +
-                '' + grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename) + '\');';
+                '' + grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename) + '\'';
 
-            test.equal(grunt.file.read(abspath), grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename), message);
+            test.equal(expected, grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename), message);
         }
     });
     test.done();
