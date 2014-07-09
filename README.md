@@ -273,6 +273,54 @@ Default value: `undefined`
 
 This value specifies a list of directories that should be added into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
 
+#### options.preinst.src
+Type: `String`
+Default value: `undefined`
+
+This value specifies the path of the preinst script, the contents of this file will be copied into the preinst script.  If both `src` and `contents` are specified `src` will take precedence. The preinst script is executed before the package is unpacked from its Debian archive (".deb") file. Many 'preinst' scripts stop services for packages which are being upgraded until their installation or upgrade is completed (following the successful execution of the 'postinst' script).
+
+#### options.preinst.contents
+Type: `String`
+Default value: `undefined`
+
+This value specifies the contents of the preinst script, the value will be copied into the preinst script.  If both `src` and `contents` are specified `src` will take precedence. The preinst script is executed before the package is unpacked from its Debian archive (".deb") file. Many 'preinst' scripts stop services for packages which are being upgraded until their installation or upgrade is completed (following the successful execution of the 'postinst' script).
+
+#### options.postinst.src
+Type: `String`
+Default value: `undefined`
+
+This value specifies the path of the postinst script, the contents of this file will be copied into the postinst script.  If both `src` and `contents` are specified `src` will take precedence. The postinst script typically completes any required configuration of the package foo once foo has been unpacked from its Debian archive (".deb") file. Often, 'postinst' scripts ask the user for input, and/or warn the user that if he accepts default values, he should remember to go back and re-configure that package as the situation warrants. Many 'postinst' scripts then execute any commands necessary to start or restart a service once a new package has been installed or upgraded.
+
+#### options.postinst.contents
+Type: `String`
+Default value: `undefined`
+
+This value specifies the contents of the postinst script, the value will be copied into the postinst script.  If both `src` and `contents` are specified `src` will take precedence. The postinst script typically completes any required configuration of the package foo once foo has been unpacked from its Debian archive (".deb") file. Often, 'postinst' scripts ask the user for input, and/or warn the user that if he accepts default values, he should remember to go back and re-configure that package as the situation warrants. Many 'postinst' scripts then execute any commands necessary to start or restart a service once a new package has been installed or upgraded.
+
+#### options.prerm.src
+Type: `String`
+Default value: `undefined`
+
+This value specifies the path of the prerm script, the contents of this file will be copied into the prerm script.  If both `src` and `contents` are specified `src` will take precedence. The prerm script typically stops any daemons which are associated with a package. It is executed before the removal of files associated with the package.
+
+#### options.prerm.contents
+Type: `String`
+Default value: `undefined`
+
+This value specifies the contents of the prerm script, the value will be copied into the prerm script.  If both `src` and `contents` are specified `src` will take precedence. The prerm script typically stops any daemons which are associated with a package. It is executed before the removal of files associated with the package.
+
+#### options.postrm.src
+Type: `String`
+Default value: `undefined`
+
+This value specifies the path of the postrm script, the contents of this file will be copied into the postrm script.  If both `src` and `contents` are specified `src` will take precedence. The postrm script typically modifies links or other files associated with foo, and/or removes files created by the package.
+
+#### options.postrm.contents
+Type: `String`
+Default value: `undefined`
+
+This value specifies the contents of the postrm script, the value will be copied into the postrm script.  If both `src` and `contents` are specified `src` will take precedence. The postrm script typically modifies links or other files associated with foo, and/or removes files created by the package.
+
 ### Files
 
 The files configuration specifies the files to add into the package.
@@ -336,6 +384,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-16-05   v0.1.6   Fixed errors with package upload
  * 2014-23-06   v0.1.7   Added support for postfix
  * 2014-24-06   v0.1.8   Minor tweaks and better test coverage
+ * 2014-09-07   v0.1.9   Added initial support for post/pre scripts
 
 ---
 

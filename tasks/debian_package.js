@@ -144,10 +144,11 @@ module.exports = function (grunt) {
                 dateFormat = require('dateformat'),
                 now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
                 temp_directory = options.working_directory + packagingFilesDirectory,
-                changelog = temp_directory + '/debian/changelog',
-                control = temp_directory + '/debian/control',
-                links = temp_directory + '/debian/links',
-                dirs = temp_directory + '/debian/dirs',
+                controlDirectory = temp_directory + '/debian',
+                changelog = controlDirectory + '/changelog',
+                control = controlDirectory + '/control',
+                links = controlDirectory + '/links',
+                dirs = controlDirectory + '/dirs',
                 makefile = temp_directory + '/Makefile';
 
             if (!hasValidOptions(options)) {
@@ -183,6 +184,19 @@ module.exports = function (grunt) {
             findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
 
             preparePackageContents(makefile, this.files);
+
+            var scripts = ['preinst', 'postinst', 'prerm', 'postrm'];
+            for (var i = 0; i < scripts.length; i++) {
+                if (options[scripts[i]]) {
+                    var destination = controlDirectory + '/' + scripts[i];
+                    grunt.verbose.writeln(JSON.stringify(options[scripts[i]]));
+                    if (options[scripts[i]].src) {
+                        grunt.file.copy(options[scripts[i]].src, destination);
+                    } else if (options[scripts[i]].contents) {
+                        grunt.file.write(destination, options[scripts[i]].contents);
+                    }
+                }
+            }
 
             grunt.verbose.writeln('Running \'debuild --no-tgz-check -sa -us -uc --lintian-opts --suppress-tags tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www\'');
             if (grunt.file.exists('/usr/bin/debuild')) {

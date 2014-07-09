@@ -24,7 +24,7 @@ module.exports = function (grunt) {
 
         // before generating any new files, remove any previously-created files
         clean: {
-            tests: ['tmp']
+            tests: ['tmp', 'custom_tmp']
         },
 
         // configuration to be run (and then tested)
@@ -57,6 +57,18 @@ module.exports = function (grunt) {
                     long_description: "the long description added to the debian package",
                     version: "2.0.0",
                     build_number: "1",
+                    preinst: {
+                        src: 'tests/test_preinst.sh',
+                        contents: '#!/bin/bash\n' +
+                            'echo "test preinst script from contents"'
+                    },
+                    postinst: {
+                        src: 'tests/test_postinst.sh'
+                    },
+                    prerm: {
+                        contents: '#!/bin/bash\n' +
+                            'echo "test prerm script from contents"'
+                    },
                     links: [
                         {
                             source: '/var/log/${name}',
