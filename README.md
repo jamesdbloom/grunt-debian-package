@@ -9,7 +9,7 @@ Grunt plugin to create a Debian package, allowing JavaScript applications to be 
 
 
 
-[![NPM](https://nodei.co/npm/grunt-debian-package.png?downloads=true&stars=true)](https://nodei.co/npm/grunt-debian-package/)
+[![NPM](https://nodei.co/npm/grunt-debian-package.png?downloads=true&stars=true)](https://nodei.co/npm/grunt-debian-package/) [![wercker status](https://app.wercker.com/status/1bd98ba2b740e62bf5f15cb335de7495/m "wercker status")](https://app.wercker.com/project/bykey/1bd98ba2b740e62bf5f15cb335de7495)
 
 ## Getting Started
 This plugin requires Grunt `~0.4`
