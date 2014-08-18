@@ -90,7 +90,8 @@ grunt.initConfig({
         ],
         directories: [
             '/var/app/${name}'
-        ]
+        ],
+        dependencies: "couchdb, redis-server"
     },
     files: [
         {

@@ -149,7 +149,8 @@ module.exports = function (grunt) {
                 control = controlDirectory + '/control',
                 links = controlDirectory + '/links',
                 dirs = controlDirectory + '/dirs',
-                makefile = temp_directory + '/Makefile';
+                makefile = temp_directory + '/Makefile',
+                dependenciesLine = '';
 
             if (!hasValidOptions(options)) {
                 return done(false);
@@ -173,6 +174,10 @@ module.exports = function (grunt) {
                 // add extra space at start to ensure format is correct and allow simple unit test comparisons
                 options.long_description = ' ' + options.long_description;
             }
+            
+            if (options.dependencies) {
+                dependenciesLine = ', ' + options.dependencies;
+            }
 
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
@@ -182,6 +187,7 @@ module.exports = function (grunt) {
             findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
+            findAndReplace([control], '\\$\\{dependencies\\}', dependenciesLine);
 
             preparePackageContents(makefile, this.files);
 
