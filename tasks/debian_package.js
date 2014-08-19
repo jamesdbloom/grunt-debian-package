@@ -222,10 +222,10 @@ module.exports = function (grunt) {
                         } else {
                             cleanUp(options);
                             grunt.log.ok('Created package: ' + grunt.file.expand(packageLocation(options) + '*.deb'));
-                            if (options.respository) {
-                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
+                            if (options.repository) {
+                                grunt.verbose.writeln('Running \'dput ' + options.repository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
                                 require('fs').chmodSync("" + grunt.file.expand(packageLocation(options) + '*.changes'), "744");
-                                var dputArguments = [options.respository, grunt.file.expand(packageLocation(options) + '*.changes')];
+                                var dputArguments = [options.repository, grunt.file.expand(packageLocation(options) + '*.changes')];
                                 if (grunt.option('verbose')) {
                                     dputArguments.unshift('-d');
                                 }
