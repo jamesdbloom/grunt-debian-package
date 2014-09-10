@@ -1,4 +1,4 @@
-/*
+///*
  * grunt-debian-package
  * https://github.com/jamesdbloom/grunt-debian-package
  *
@@ -95,7 +95,7 @@ module.exports = function (grunt) {
                     }
                 }).map(function (filepath) {
                     grunt.log.writeln('Adding \'' + filepath + '\' to \'' + file.dest + '\'');
-                    return '\tmkdir -p $(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + ' && cp -a ' + process.cwd() + '/' + filepath + ' $(DESTDIR)' + file.dest + '\n';
+                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a "' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
                 }).join('');
             });
         },
