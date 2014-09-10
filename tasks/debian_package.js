@@ -1,4 +1,4 @@
-///*
+/*
  * grunt-debian-package
  * https://github.com/jamesdbloom/grunt-debian-package
  *
