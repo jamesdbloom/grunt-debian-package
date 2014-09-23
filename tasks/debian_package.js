@@ -90,6 +90,8 @@ module.exports = function (grunt) {
                     if (!grunt.file.exists(filepath)) {
                         grunt.log.warn('File \'' + filepath + '\' not found');
                         return false;
+                    } else if (grunt.file.isDir(filepath)) {
+                        return false;
                     } else {
                         return true;
                     }
