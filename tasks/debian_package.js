@@ -97,7 +97,7 @@ module.exports = function (grunt) {
                     }
                 }).map(function (filepath) {
                     grunt.log.writeln('Adding \'' + filepath + '\' to \'' + file.dest + '\'');
-                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a "' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
+                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a -P "' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
                 }).join('');
             });
         },
@@ -151,7 +151,8 @@ module.exports = function (grunt) {
                 control = controlDirectory + '/control',
                 links = controlDirectory + '/links',
                 dirs = controlDirectory + '/dirs',
-                makefile = temp_directory + '/Makefile';
+                makefile = temp_directory + '/Makefile',
+                dependenciesLine = '';
 
             if (!hasValidOptions(options)) {
                 return done(false);
@@ -175,6 +176,10 @@ module.exports = function (grunt) {
                 // add extra space at start to ensure format is correct and allow simple unit test comparisons
                 options.long_description = ' ' + options.long_description;
             }
+            
+            if (options.dependencies) {
+                dependenciesLine = ', ' + options.dependencies;
+            }
 
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
@@ -184,6 +189,7 @@ module.exports = function (grunt) {
             findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
+            findAndReplace([control], '\\$\\{dependencies\\}', dependenciesLine);
 
             preparePackageContents(makefile, this.files);
 
@@ -218,10 +224,10 @@ module.exports = function (grunt) {
                         } else {
                             cleanUp(options);
                             grunt.log.ok('Created package: ' + grunt.file.expand(packageLocation(options) + '*.deb'));
-                            if (options.respository) {
-                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
+                            if (options.repository) {
+                                grunt.verbose.writeln('Running \'dput ' + options.repository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
                                 require('fs').chmodSync("" + grunt.file.expand(packageLocation(options) + '*.changes'), "744");
-                                var dputArguments = [options.respository, grunt.file.expand(packageLocation(options) + '*.changes')];
+                                var dputArguments = [options.repository, grunt.file.expand(packageLocation(options) + '*.changes')];
                                 if (grunt.option('verbose')) {
                                     dputArguments.unshift('-d');
                                 }
