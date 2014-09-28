@@ -84,20 +84,19 @@ module.exports = function (grunt) {
                 findAndReplace(files, find, replace);
             }
         },
-        preparePackageContents = function (makefile, files) {
+        preparePackageContents = function (makefile, files, follow_soft_links) {
             transformAndReplace([makefile], '\\$\\{file_list\\}', files, function (file) {
                 return file.src.filter(function (filepath) {
                     if (!grunt.file.exists(filepath)) {
                         grunt.log.warn('File \'' + filepath + '\' not found');
                         return false;
-                    } else if (grunt.file.isDir(filepath)) {
-                        return false;
                     } else {
-                        return true;
+                        return !grunt.file.isDir(filepath);
                     }
                 }).map(function (filepath) {
                     grunt.log.writeln('Adding \'' + filepath + '\' to \'' + file.dest + '\'');
-                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a "' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
+                    var soft_links_argument = "-P ";
+                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a ' + (follow_soft_links ?  "" : "-P ") + '"' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
                 }).join('');
             });
         },
@@ -151,7 +150,8 @@ module.exports = function (grunt) {
                 control = controlDirectory + '/control',
                 links = controlDirectory + '/links',
                 dirs = controlDirectory + '/dirs',
-                makefile = temp_directory + '/Makefile';
+                makefile = temp_directory + '/Makefile',
+                dependencies = '';
 
             if (!hasValidOptions(options)) {
                 return done(false);
@@ -176,6 +176,10 @@ module.exports = function (grunt) {
                 options.long_description = ' ' + options.long_description;
             }
 
+            if (options.dependencies) {
+                dependencies = ', ' + options.dependencies;
+            }
+
             findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
             findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
             findAndReplace([changelog], '\\$\\{date\\}', now);
@@ -184,8 +188,9 @@ module.exports = function (grunt) {
             findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
             findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
+            findAndReplace([control], '\\$\\{dependencies\\}', dependencies);
 
-            preparePackageContents(makefile, this.files);
+            preparePackageContents(makefile, this.files, options.follow_soft_links);
 
             var scripts = ['preinst', 'postinst', 'prerm', 'postrm'];
             for (var i = 0; i < scripts.length; i++) {
@@ -218,10 +223,10 @@ module.exports = function (grunt) {
                         } else {
                             cleanUp(options);
                             grunt.log.ok('Created package: ' + grunt.file.expand(packageLocation(options) + '*.deb'));
-                            if (options.respository) {
-                                grunt.verbose.writeln('Running \'dput ' + options.respository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
+                            if (options.repository) {
+                                grunt.verbose.writeln('Running \'dput ' + options.repository + ' ' + grunt.file.expand(packageLocation(options) + '*.changes') + '\'');
                                 require('fs').chmodSync("" + grunt.file.expand(packageLocation(options) + '*.changes'), "744");
-                                var dputArguments = [options.respository, grunt.file.expand(packageLocation(options) + '*.changes')];
+                                var dputArguments = [options.repository, grunt.file.expand(packageLocation(options) + '*.changes')];
                                 if (grunt.option('verbose')) {
                                     dputArguments.unshift('-d');
                                 }

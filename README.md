@@ -90,7 +90,8 @@ grunt.initConfig({
         ],
         directories: [
             '/var/app/${name}'
-        ]
+        ],
+        dependencies: "couchdb, redis-server"
     },
     files: [
         {
@@ -261,18 +262,6 @@ Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || pr
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
 
-#### options.links
-Type: `String`
-Default value: `undefined`
-
-This value specifies a list of soft-links that should be added into the package.  Each soft-link is specified using a `source` and a `target` value.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
-
-#### options.directories
-Type: `String`
-Default value: `undefined`
-
-This value specifies a list of directories that should be added into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
-
 #### options.preinst.src
 Type: `String`
 Default value: `undefined`
@@ -320,6 +309,24 @@ Type: `String`
 Default value: `undefined`
 
 This value specifies the contents of the postrm script, the value will be copied into the postrm script.  If both `src` and `contents` are specified `src` will take precedence. The postrm script typically modifies links or other files associated with foo, and/or removes files created by the package.
+
+#### options.links
+Type: `String`
+Default value: `undefined`
+
+This value specifies a list of soft-links that should be added into the package.  Each soft-link is specified using a `source` and a `target` value.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
+
+#### options.directories
+Type: `String`
+Default value: `undefined`
+
+This value specifies a list of directories that should be added into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively, see example above.
+
+#### options.follow_soft_links
+Type: `Boolean`
+Default value: `undefined`
+
+This value specifies whether soft-links should be followed when copying files into the package.  By default as this value is undefined soft-links will not be followed.
 
 ### Files
 
