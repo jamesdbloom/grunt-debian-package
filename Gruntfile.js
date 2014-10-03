@@ -15,7 +15,8 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 'tasks/*.js',
-                '<%= nodeunit.tests %>'
+                '<%= nodeunit.unit %>',
+                '<%= nodeunit.integration %>'
             ],
             options: {
                 jshintrc: '.jshintrc'
@@ -24,13 +25,15 @@ module.exports = function (grunt) {
 
         // before generating any new files, remove any previously-created files
         clean: {
-            tests: ['tmp', 'custom_tmp']
+            pre_test: ['tmp', 'test/unit/tmp', 'test/integration/tmp'],
+            post_test: ['tmp', 'test/unit/tmp', 'test/integration/tmp']
         },
 
         // configuration to be run (and then tested)
         debian_package: {
             default_options: {
                 options: {
+                    quiet: true,
                     maintainer: {
                         name: "James D Bloom",
                         email: "jamesdbloom@email.com"
@@ -46,6 +49,7 @@ module.exports = function (grunt) {
             },
             custom_options: {
                 options: {
+                    quiet: true,
                     maintainer: {
                         name: "James D Bloom",
                         email: "jamesdbloom@email.com"
@@ -58,12 +62,12 @@ module.exports = function (grunt) {
                     version: "2.0.0",
                     build_number: "1",
                     preinst: {
-                        src: 'tests/test_preinst.sh',
+                        src: 'test/integration/test_preinst.sh',
                         contents: '#!/bin/bash\n' +
                             'echo "test preinst script from contents"'
                     },
                     postinst: {
-                        src: 'tests/test_postinst.sh'
+                        src: 'test/integration/test_postinst.sh'
                     },
                     prerm: {
                         contents: '#!/bin/bash\n' +
@@ -82,7 +86,7 @@ module.exports = function (grunt) {
                     directories: [
                         '/var/app/${name}'
                     ],
-                    working_directory: 'custom_tmp/',
+                    working_directory: 'test/integration/tmp/',
                     simulate: true
                 },
                 files: [
@@ -96,8 +100,8 @@ module.exports = function (grunt) {
                     },
                     {
                         src: [
-                            'tests/custom_options/packaging/debian/changelog',
-                            'tests/custom_options/packaging/debian/control'
+                            'test/integration/custom_options/packaging/debian/changelog',
+                            'test/integration/custom_options/packaging/debian/control'
                         ],
                         dest: '/var/www/'
                     }
@@ -105,9 +109,39 @@ module.exports = function (grunt) {
             }
         },
 
+        /*
+         ======== A Handy Little Nodeunit Reference ========
+         https://github.com/caolan/nodeunit
+
+         Test methods:
+         test.expect(numAssertions)
+         test.done()
+
+         Test assertions:
+         test.fail(actual, expected, message, operator, stackStartFunction value)
+         test.ok(value, [message])
+         test.equal(actual, expected, [message])
+         test.notEqual(actual, expected, [message])
+         test.deepEqual(actual, expected, [message])
+         test.notDeepEqual(actual, expected, [message])
+         test.strictEqual(actual, expected, [message])
+         test.notStrictEqual(actual, expected, [message])
+         test.throws(block, [error], [message])
+         test.doesNotThrow(block, [error], [message])
+         test.ifError(value)
+         */
+
         // Unit tests.
         nodeunit: {
-            tests: ['tests/*_test.js']
+            unit: [
+                'test/unit/*_test.js'
+            ],
+            integration: [
+                'test/integration/*_test.js'
+            ],
+            options: {
+                reporter: 'nested'
+            }
         }
     });
 
@@ -118,7 +152,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-    grunt.registerTask('test', ['clean', 'debian_package', 'nodeunit']);
+    grunt.registerTask('test', ['clean:pre_test', 'debian_package', 'nodeunit', 'clean:post_test']);
 
     grunt.registerTask('default', ['jshint', 'test']);
     grunt.registerTask('travis', ['jshint', 'test']);
