@@ -67,13 +67,52 @@
         }),
         'copy': testCase({
             setUp: function (callback) {
-                this.mockGrunt = {
-                    verbose: {
-                        writeln: sinon.spy.create()
-                    }
-                };
-                this._copy = require('../../tasks/fileOrDirectory.js')._copy(this.mockGrunt);
+                this.grunt = require('grunt');
+                this._copy = require('../../tasks/fileOrDirectory.js')._copy(this.grunt);
                 callback();
+            },
+            'should copy directory and its containing files': function (test) {
+                // given
+                var directory = "test/unit/tmp/directory_to_copy",
+                    sub_directory = directory + "/subdirectory",
+                    files = [
+                            directory + "/file_one.txt",
+                            directory + "/file_two.txt",
+                            sub_directory + "/file_three.txt",
+                            sub_directory + "/file_four.txt"
+                    ],
+                    i = 0,
+                    target_directory = "test/unit/tmp/target_directory",
+                    target_sub_directory = target_directory + "/subdirectory",
+                    target_files = [
+                            target_directory + "/file_one.txt",
+                            target_directory + "/file_two.txt",
+                            target_sub_directory + "/file_three.txt",
+                            target_sub_directory + "/file_four.txt"
+                    ];
+
+                this.grunt.file.mkdir(directory);
+                this.grunt.file.mkdir(sub_directory);
+                for (; i < files.length; i++) {
+                    this.grunt.file.copy("test/unit/test_file.txt", files[i]);
+                }
+
+                // when
+                test.ok(this.grunt.file.exists(directory), "Exists before being deleted");
+                test.ok(this.grunt.file.isDir(directory), "Checking is directory before being deleted");
+                this._copy(directory, target_directory);
+
+                // then
+                test.ok(this.grunt.file.exists(target_directory), "Target directory created");
+                test.ok(this.grunt.file.isDir(target_directory), "Target directory is a directory");
+                test.ok(this.grunt.file.exists(target_sub_directory), "Target sub-directory created");
+                test.ok(this.grunt.file.isDir(target_sub_directory), "Target sub-directory is a directory");
+                for (i = 0; i < target_files.length; i++) {
+                    test.ok(this.grunt.file.exists(target_files[i]), "Target file created");
+                }
+
+                // end
+                test.done();
             }
         })
     };
