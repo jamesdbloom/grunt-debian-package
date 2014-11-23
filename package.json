@@ -39,7 +39,7 @@
         "grunt-contrib-nodeunit": "~0.4",
         "grunt-run-node": "~0.1",
         "nodeunit": "~0.9",
-        "sinon": "~1.10"
+        "sinon": "~1.1"
     },
     "peerDependencies": {
         "grunt": "~0.4"
