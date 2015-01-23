@@ -78,6 +78,8 @@ grunt.initConfig({
         long_description: "the long description added to the debian package",
         version: "2.0.0",
         build_number: "1",
+        target_architecture: "amd64",
+        category: "devel",
         links: [
             {
                 source: '/var/log/${name}',
@@ -262,6 +264,18 @@ Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || pr
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
 
+#### options.target_architecture
+Type: `String` (possible values are `amd64`, `i386`, `all`, `any`)
+Default value: `all`
+
+The targeted architecture
+
+#### options.category
+Type: `String`
+Default value: `misc`
+
+The software category. Used to fill the "section" field of the control file
+
 #### options.preinst.src
 Type: `String`
 Default value: `undefined`
@@ -369,6 +383,8 @@ options: {
   long_description: properties.description && properties.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
   version: properties.version,
   build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER
+  target_architecture: "all",
+  category: "misc"
 }
 ```
 
