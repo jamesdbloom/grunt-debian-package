@@ -56,7 +56,9 @@ module.exports = function (grunt) {
                     version: pkg.version,
                     build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
                     working_directory: 'tmp/',
-                    packaging_directory_name: 'packaging'
+                    packaging_directory_name: 'packaging',
+                    target_architecture: "all",
+                    category: "misc"
                 }),
                 spawn = require('child_process').spawn,
                 dateFormat = require('dateformat'),
@@ -101,8 +103,8 @@ module.exports = function (grunt) {
             _findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             _findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
             _findAndReplace([control], '\\$\\{dependencies\\}', dependencies);
-            _findAndReplace([control], '\\$\\{target_architecture\\}', options.target_architecture || "all");
-            _findAndReplace([control], '\\$\\{category\\}', options.category || "misc");
+            _findAndReplace([control], '\\$\\{target_architecture\\}', options.target_architecture);
+            _findAndReplace([control], '\\$\\{category\\}', options.category);
             preparePackageContents(makefile, this.files, options.follow_soft_links, options.quiet);
 
             // copy package lifecycle scripts
