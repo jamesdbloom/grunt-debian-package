@@ -131,7 +131,7 @@ module.exports = function (grunt) {
                         if (code !== 0) {
                             var logFile = grunt.file.read(grunt.file.expand(options.package_location + '*.build'));
                             grunt.log.subhead('\nerror running debuild!!');
-                            if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
+                            if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper") !== -1) {
                                 grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
                             }
                             done(false);
