@@ -342,6 +342,28 @@ Default value: `undefined`
 
 This value specifies whether soft-links should be followed when copying files into the package.  By default as this value is undefined soft-links will not be followed.
 
+#### options.custom_template
+Type: `String`
+Default value: `undefined`
+
+This value specifies a custom template directory. It can be used to override the files of the default template (especially useful for overridding copyright or changelog).
+The content of the directory should have the following structure
+```
+- MakeFile
+- debian
+  - changelog
+  - compat
+  - control
+  - copyright
+  - dirs
+  - links
+  - rules
+  - source
+    - format
+```
+Any missing file will be replaced by the default ones (See [packaging](https://github.com/jamesdbloom/grunt-debian-package/tree/master/packaging) directory)
+The files from the custom_template directory are processed the same way than the default ones, so use of variables is possible
+
 ### Files
 
 The files configuration specifies the files to add into the package.

@@ -78,6 +78,10 @@ module.exports = function (grunt) {
 
             _cleanUp(options, true);
             _copy(__dirname + '/../' + options.packaging_directory_name, temp_directory);
+            
+            if (options.custom_template) {
+            	_copy(options.custom_template, temp_directory);
+            }
 
             // set environment variables if they are not already set
             process.env.DEBFULLNAME = options.maintainer.name;
