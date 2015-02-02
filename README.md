@@ -212,13 +212,13 @@ dpkg -L prefix-package_name-postfix
 
 #### options.maintainer.name
 Type: `String`
-Default value: `process.env.DEBFULLNAME`
+Default value: `process.env.DEBFULLNAME` or **package.json** `author.name`
 
 This value specifies the maintainer's name for the debian package.  The default value is taken from the standard debian environment variable `DEBFULLNAME`.
 
 #### options.maintainer.email
 Type: `String`
-Default value: `process.env.DEBEMAIL`
+Default value: `process.env.DEBEMAIL` or **package.json** `author.email`
 
 This value specifies the maintainer's email for the debian package.  The default value is taken from the standard debian environment variable `DEBEMAIL`.
 

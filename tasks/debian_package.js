@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                     maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
                         name: process.env.DEBFULLNAME,
                         email: process.env.DEBEMAIL
-                    },
+                    } || pkg.author && pkg.author.name && pkg.author.email && pkg.author,
                     name: pkg.name,
                     prefix: "",
                     postfix: "",
