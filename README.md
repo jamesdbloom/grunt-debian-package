@@ -78,6 +78,8 @@ grunt.initConfig({
         long_description: "the long description added to the debian package",
         version: "2.0.0",
         build_number: "1",
+        target_architecture: "amd64",
+        category: "devel",
         links: [
             {
                 source: '/var/log/${name}',
@@ -210,13 +212,13 @@ dpkg -L prefix-package_name-postfix
 
 #### options.maintainer.name
 Type: `String`
-Default value: `process.env.DEBFULLNAME`
+Default value: `process.env.DEBFULLNAME` or **package.json** `author.name`
 
 This value specifies the maintainer's name for the debian package.  The default value is taken from the standard debian environment variable `DEBFULLNAME`.
 
 #### options.maintainer.email
 Type: `String`
-Default value: `process.env.DEBEMAIL`
+Default value: `process.env.DEBEMAIL` or **package.json** `author.email`
 
 This value specifies the maintainer's email for the debian package.  The default value is taken from the standard debian environment variable `DEBEMAIL`.
 
@@ -261,6 +263,18 @@ Type: `String`
 Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER`
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
+
+#### options.target_architecture
+Type: `String` (possible values are `amd64`, `i386`, `all`, `any`)
+Default value: `all`
+
+The targeted architecture
+
+#### options.category
+Type: `String`
+Default value: `misc`
+
+The software category. Used to fill the "section" field of the control file
 
 #### options.preinst.src
 Type: `String`
@@ -328,6 +342,28 @@ Default value: `undefined`
 
 This value specifies whether soft-links should be followed when copying files into the package.  By default as this value is undefined soft-links will not be followed.
 
+#### options.custom_template
+Type: `String`
+Default value: `undefined`
+
+This value specifies a custom template directory. It can be used to override the files of the default template (especially useful for overridding copyright or changelog).
+The content of the directory should have the following structure
+```
+- MakeFile
+- debian
+  - changelog
+  - compat
+  - control
+  - copyright
+  - dirs
+  - links
+  - rules
+  - source
+    - format
+```
+Any missing file will be replaced by the default ones (See [packaging](https://github.com/jamesdbloom/grunt-debian-package/tree/master/packaging) directory)
+The files from the custom_template directory are processed the same way than the default ones, so use of variables is possible
+
 ### Files
 
 The files configuration specifies the files to add into the package.
@@ -369,6 +405,8 @@ options: {
   long_description: properties.description && properties.description.split(/\r\n|\r|\n/g).splice(1).join(' '),
   version: properties.version,
   build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER
+  target_architecture: "all",
+  category: "misc"
 }
 ```
 

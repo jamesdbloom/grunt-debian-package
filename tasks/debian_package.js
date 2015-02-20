@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                     maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
                         name: process.env.DEBFULLNAME,
                         email: process.env.DEBEMAIL
-                    },
+                    } || pkg.author && pkg.author.name && pkg.author.email && pkg.author,
                     name: pkg.name,
                     prefix: "",
                     postfix: "",
@@ -56,7 +56,9 @@ module.exports = function (grunt) {
                     version: pkg.version,
                     build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
                     working_directory: 'tmp/',
-                    packaging_directory_name: 'packaging'
+                    packaging_directory_name: 'packaging',
+                    target_architecture: "all",
+                    category: "misc"
                 }),
                 spawn = require('child_process').spawn,
                 dateFormat = require('dateformat'),
@@ -76,6 +78,10 @@ module.exports = function (grunt) {
 
             _cleanUp(options, true);
             _copy(__dirname + '/../' + options.packaging_directory_name, temp_directory);
+            
+            if (options.custom_template) {
+            	_copy(options.custom_template, temp_directory);
+            }
 
             // set environment variables if they are not already set
             process.env.DEBFULLNAME = options.maintainer.name;
@@ -101,6 +107,8 @@ module.exports = function (grunt) {
             _findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
             _findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
             _findAndReplace([control], '\\$\\{dependencies\\}', dependencies);
+            _findAndReplace([control], '\\$\\{target_architecture\\}', options.target_architecture);
+            _findAndReplace([control], '\\$\\{category\\}', options.category);
             preparePackageContents(makefile, this.files, options.follow_soft_links, options.quiet);
 
             // copy package lifecycle scripts
@@ -129,7 +137,7 @@ module.exports = function (grunt) {
                         if (code !== 0) {
                             var logFile = grunt.file.read(grunt.file.expand(options.package_location + '*.build'));
                             grunt.log.subhead('\nerror running debuild!!');
-                            if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper")) {
+                            if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper") !== -1) {
                                 grunt.log.warn('debhelper dependency not found try running \'sudo apt-get install debhelper\'');
                             }
                             done(false);
