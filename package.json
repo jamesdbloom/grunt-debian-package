@@ -35,11 +35,11 @@
     "devDependencies": {
         "grunt": "~0.4",
         "grunt-contrib-clean": "~0.6",
-        "grunt-contrib-jshint": "~0.10",
+        "grunt-contrib-jshint": "~0.11",
         "grunt-contrib-nodeunit": "~0.4",
         "grunt-run-node": "~0.1",
         "nodeunit": "~0.9",
-        "sinon": "~1.1"
+        "sinon": "~1.13"
     },
     "peerDependencies": {
         "grunt": "~0.4"
