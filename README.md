@@ -431,6 +431,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-24-06   v0.1.8   Minor tweaks and better test coverage
  * 2014-09-07   v0.1.9   Added initial support for post/pre scripts
  * 2014-09-07   v0.1.10  Multiple minor bug fixes and improvements
+ * 2014-09-07   v0.1.11  Several minor bug fixes and improvements
 
 ---
 
