@@ -264,6 +264,12 @@ Default value: `process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || pr
 
 The second part of the version number.  This version number is intended to respresent a specific build of the package, for example this package might represetn the Jenkins or drone.io or TravisCI build number.  The default value is taken from an environment variable called `BUILD_NUMBER` or `DRONE_BUILD_NUMBER` or `TRAVIS_BUILD_NUMBER` which is compatible with Jenkins, drone.io and TravisCI respectively.
 
+### options.disable_debuild_deps_check
+Type: `Boolean`
+Default value: `false`
+
+Some distributions like Arch Linux will fail the dpkg dependency checks causing `debuild` to fail. Use with caution.
+
 #### options.target_architecture
 Type: `String` (possible values are `amd64`, `i386`, `all`, `any`)
 Default value: `all`
