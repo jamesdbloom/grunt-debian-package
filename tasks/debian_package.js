@@ -58,7 +58,8 @@ module.exports = function (grunt) {
                     working_directory: 'tmp/',
                     packaging_directory_name: 'packaging',
                     target_architecture: "all",
-                    category: "misc"
+                    category: "misc",
+                    disable_debuild_deps_check: false
                 }),
                 spawn = require('child_process').spawn,
                 dateFormat = require('dateformat'),
@@ -129,7 +130,8 @@ module.exports = function (grunt) {
             grunt.verbose.writeln('Running \'debuild --no-tgz-check -sa -us -uc --lintian-opts --suppress-tags tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www\'');
             if (!options.simulate) {
                 if (grunt.file.exists('/usr/bin/debuild')) {
-                    var debuild = spawn('debuild', ['--no-tgz-check', '-sa', '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
+                    var checkDeps = options.disable_debuild_deps_check ? "-d" : "-D";
+                    var debuild = spawn('debuild', ['--no-tgz-check', '-sa', checkDeps, '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
                         cwd: temp_directory,
                         stdio: [ 'ignore', (grunt.option('verbose') ? process.stdout : 'ignore'), process.stderr ]
                     });
