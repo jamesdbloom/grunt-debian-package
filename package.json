@@ -15,12 +15,7 @@
     "bugs": {
         "url": "https://github.com/jamesdbloom/grunt-debian-package/issues"
     },
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "https://github.com/jamesdbloom/grunt-debian-package/blob/master/LICENSE-MIT"
-        }
-    ],
+    "license": "Apache-2.0",
     "engines": {
         "node": ">= 0.8.0"
     },
@@ -33,10 +28,10 @@
         "replace": "~0.3"
     },
     "devDependencies": {
-        "grunt": "~0.4",
-        "grunt-contrib-clean": "~0.6",
+        "grunt": ">=0.4",
+        "grunt-contrib-clean": "~1.0",
         "grunt-contrib-jshint": "~0.11",
-        "grunt-contrib-nodeunit": "~0.4",
+        "grunt-contrib-nodeunit": "~1.0",
         "grunt-run-node": "~0.1",
         "nodeunit": "~0.9",
         "sinon": "~1.13"
