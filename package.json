@@ -23,18 +23,18 @@
         "test": "grunt travis"
     },
     "dependencies": {
-        "dateformat": "~1.0",
+        "dateformat": "~2.0",
         "node-spawn": "~0.0",
         "replace": "~0.3"
     },
     "devDependencies": {
         "grunt": ">=0.4",
-        "grunt-contrib-clean": "~1.0",
-        "grunt-contrib-jshint": "~0.11",
+        "grunt-contrib-clean": "~1.1",
+        "grunt-contrib-jshint": "~1.1",
         "grunt-contrib-nodeunit": "~1.0",
         "grunt-run-node": "~0.1",
-        "nodeunit": "~0.9",
-        "sinon": "~1.13"
+        "nodeunit": "~0.11",
+        "sinon": "~2.1"
     },
     "peerDependencies": {
         "grunt": ">=0.4"
