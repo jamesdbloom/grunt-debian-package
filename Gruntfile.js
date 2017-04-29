@@ -155,5 +155,4 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['clean:pre_test', 'debian_package', 'nodeunit', 'clean:post_test']);
 
     grunt.registerTask('default', ['jshint', 'test']);
-    grunt.registerTask('travis', ['default']);
 };
