@@ -436,6 +436,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
  * 2014-09-07   v0.1.10  Multiple minor bug fixes and improvements
  * 2014-09-07   v0.1.11  Several minor bug fixes and improvements
  * 2016-10-22   v0.1.12  #22, #24 and dependency / license fixes
+ * 2017-04-29   v0.1.13   Updated build & other badges
 
 ---
 

@@ -1,0 +1,32 @@
+{
+    "name": "grunt-debian-package",
+    "version": "0.1.13",
+    "homepage": "https://github.com/jamesdbloom/grunt-debian-package",
+    "authors": [
+        "James Bloom <jamesdbloom@gmail.com>"
+    ],
+    "description": "Create debian package from grunt build",
+    "main": [
+        "tasks/debian_package.js"
+    ],
+    "keywords": [
+        "debian",
+        "gruntplugin",
+        "grunt"
+    ],
+    "license": "Apache",
+    "ignore": [
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests",
+        ".*",
+        "Gruntfile.js",
+        "*.iml",
+        "*.yml",
+        "*.jar"
+    ],
+    "moduleType": [
+        "node"
+    ]
+}
