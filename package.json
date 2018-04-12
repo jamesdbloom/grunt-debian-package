@@ -8,6 +8,9 @@
         "email": "jamesdbloom@gmail.com",
         "url": "http://blog.jamesdbloom.com"
     },
+    "scripts": {
+	"docker-test": "docker build ."
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/jamesdbloom/grunt-debian-package.git"
