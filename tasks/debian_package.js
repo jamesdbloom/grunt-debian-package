@@ -32,7 +32,13 @@ module.exports = function (grunt) {
                         grunt.log.writeln('Adding \'' + filepath + '\' to \'' + file.dest + '\'');
                     }
                     var soft_links_argument = "-P ";
-                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a ' + (follow_soft_links ? "" : "-P ") + '"' + process.cwd() + '/' + filepath + '" "$(DESTDIR)' + file.dest + '"\n';
+                    // $$ = $ in JS
+                    // next task `replace` is going to interpret $$ as $
+                    // $$ = $ in make
+                    // \$ = $ in bash
+                    var make_filepath = filepath.replace(/\$/g, '\\$$$$$$$$');
+                    var make_filedest = file.dest.replace(/\$/g, '\\$$$$$$$$');
+                    return '\tmkdir -p "$(DESTDIR)' + file.dest.substr(0, file.dest.lastIndexOf('/')) + '" && cp -a ' + (follow_soft_links ? "" : "-P ") + '"' + process.cwd() + '/' + make_filepath + '" "$(DESTDIR)' + make_filedest + '"\n';
                 }).join('');
             });
         };
